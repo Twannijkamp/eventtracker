@@ -1,0 +1,9 @@
+{
+  "events": [],
+  "team": [
+    { "id": "t1", "naam": "Jan de Vries", "initialen": "JV" },
+    { "id": "t2", "naam": "Marieke Bakker", "initialen": "MB" },
+    { "id": "t3", "naam": "Pieter Jansen", "initialen": "PJ" }
+  ],
+  "publishedTimestamp": null
+}
