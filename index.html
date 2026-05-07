@@ -199,6 +199,25 @@
   .vg-Gebiedsontwikkeling { background: #FBEAF0; color: #4B1528; }
   .vg-Algemeen { background: #F1EFE8; color: #2C2C2A; }
 
+  .type-label { font-size: 11px; padding: 2px 7px; border-radius: 4px; display: inline-block; margin-right: 3px; background: #E6F1FB; color: #042C53; border: 1px solid #B5D4F4; }
+  .vorm-label { font-size: 11px; padding: 2px 7px; border-radius: 4px; display: inline-block; margin-right: 3px; background: #F1EFE8; color: #2C2C2A; }
+
+  .tag-chip {
+    display: inline-block; padding: 2px 8px; border-radius: 10px;
+    font-size: 11px; margin-right: 3px; margin-bottom: 2px;
+    background: var(--bg); border: 1px solid var(--border-strong); color: var(--text-muted);
+  }
+  .tag-chip.tag-active { background: var(--accent-bg); border-color: var(--accent); color: #042C53; }
+
+  .deadline-warn {
+    display: inline-block; font-size: 11px; padding: 2px 7px;
+    border-radius: 4px; background: var(--warning-bg); color: #412402;
+    border: 1px solid #FAC775; font-weight: 500;
+  }
+  .deadline-passed {
+    background: var(--danger-bg); color: #501313; border-color: #F4B0B0;
+  }
+
   .person-chip {
     display: inline-flex; align-items: center; gap: 4px;
     background: var(--bg); border: 1px solid var(--border);
@@ -336,6 +355,12 @@
           <option value="">Alle statussen</option>
           <option>Gepland</option><option>Bevestigd</option><option>Onzeker</option>
           <option>Geweest</option><option>Geannuleerd</option>
+        </select>
+        <select id="filter-type">
+          <option value="">Alle types</option>
+        </select>
+        <select id="filter-tag">
+          <option value="">Alle thema's</option>
         </select>
         <span style="font-size:12px;color:var(--text-muted);margin-left:6px">Kleur:</span>
         <div class="mode-toggle" id="color-mode">
@@ -512,6 +537,9 @@ const ADMIN_PASSWORD = "WIJZIG_DIT_WACHTWOORD";
 
 const VAKGEBIEDEN = ['Planeconomie','Grondbeleid','Vastgoedrekenen','Gebiedsontwikkeling','Algemeen'];
 const STATUSSEN = ['Gepland','Bevestigd','Onzeker','Geweest','Geannuleerd'];
+const TYPES = ['Webinar','Congres','Cursus','Excursie','Bijeenkomst','Beurs'];
+const VORMEN = ['Fysiek','Online','Hybride'];
+const THEMA_TAGS = ['BBV','Grondbeleid','Planeconomie','Kostenverhaal','Omgevingswet','Woningbouw','Civieltechniek','Infra','Stedelijke transformatie'];
 const STATUS_COLORS = {
   'Gepland':     { bg: '#E6F1FB', fg: '#042C53', border: '#185FA5' },
   'Bevestigd':   { bg: '#E1F5EE', fg: '#04342C', border: '#0F6E56' },
@@ -539,7 +567,7 @@ let state = {
   currentUser: null,
   view: 'calendar',
   calDate: new Date(),
-  filter: { vakgebied: '', collega: '', status: '' },
+  filter: { vakgebied: '', collega: '', status: '', type: '', tag: '' },
   listSearch: '',
   listSort: 'date-asc',
   role: 'viewer',
@@ -567,6 +595,17 @@ function teamColor(id) {
   return idx >= 0 ? PALETTE[idx % PALETTE.length] : PALETTE[0];
 }
 function isAdmin() { return state.role === 'admin'; }
+
+function deadlineStatus(deadlineDate) {
+  if (!deadlineDate) return null;
+  const d = new Date(deadlineDate + 'T23:59:59');
+  const today = new Date(); today.setHours(0,0,0,0);
+  const diffDays = Math.floor((d - today) / (1000 * 60 * 60 * 24));
+  if (diffDays < 0) return { type: 'passed', text: 'Deadline verstreken' };
+  if (diffDays === 0) return { type: 'warn', text: 'Deadline vandaag!' };
+  if (diffDays <= 7) return { type: 'warn', text: 'Nog ' + diffDays + ' dag' + (diffDays === 1 ? '' : 'en') };
+  return null;
+}
 
 async function loadInitialData() {
   setStatus('Laden…');
@@ -705,6 +744,14 @@ function renderFilters() {
   co.onchange = e => { state.filter.collega = e.target.value; render(); };
   $('filter-status').value = state.filter.status;
   $('filter-status').onchange = e => { state.filter.status = e.target.value; render(); };
+  const ft = $('filter-type');
+  ft.innerHTML = '<option value="">Alle types</option>' +
+    TYPES.map(t => `<option ${state.filter.type === t ? 'selected' : ''}>${t}</option>`).join('');
+  ft.onchange = e => { state.filter.type = e.target.value; render(); };
+  const fg = $('filter-tag');
+  fg.innerHTML = '<option value="">Alle thema\'s</option>' +
+    THEMA_TAGS.map(t => `<option ${state.filter.tag === t ? 'selected' : ''}>${t}</option>`).join('');
+  fg.onchange = e => { state.filter.tag = e.target.value; render(); };
   document.querySelectorAll('#color-mode button').forEach(b => {
     b.classList.toggle('on', b.dataset.mode === state.colorMode);
     b.onclick = () => { state.colorMode = b.dataset.mode; render(); };
@@ -751,6 +798,8 @@ function applyFilters(events) {
     if (state.filter.vakgebied && ev.vakgebied !== state.filter.vakgebied) return false;
     if (state.filter.collega && !(ev.toegewezen || []).includes(state.filter.collega)) return false;
     if (state.filter.status && ev.status !== state.filter.status) return false;
+    if (state.filter.type && ev.type !== state.filter.type) return false;
+    if (state.filter.tag && !(ev.themaTags || []).includes(state.filter.tag)) return false;
     return true;
   });
 }
@@ -838,9 +887,11 @@ function renderList() {
       const col = teamColor(id);
       return `<span class="person-chip"><span class="avatar" style="background:${col.border}">${esc(c.initialen)}</span>${esc(c.naam.split(' ')[0])}</span>`;
     }).join('');
+    const ds = deadlineStatus(ev.deadline);
+    const typeLabels = (ev.type ? `<span class="type-label">${esc(ev.type)}</span>` : '') + (ev.vorm ? `<span class="vorm-label">${esc(ev.vorm)}</span>` : '');
     return `<tr class="row-clickable" data-event="${ev.id}">
-      <td>${fmtDate(ev.startDate)}${ev.endDate && ev.endDate !== ev.startDate ? ' – ' + fmtDate(ev.endDate) : ''}${ev.startTime ? '<br><span style="color:var(--text-muted);font-size:11px">' + esc(ev.startTime) + '</span>' : ''}</td>
-      <td><strong>${esc(ev.naam || '(geen naam)')}</strong>${ev.organisator ? '<br><span style="color:var(--text-muted);font-size:11px">' + esc(ev.organisator) + '</span>' : ''}</td>
+      <td>${fmtDate(ev.startDate)}${ev.endDate && ev.endDate !== ev.startDate ? ' – ' + fmtDate(ev.endDate) : ''}${ev.startTime ? '<br><span style="color:var(--text-muted);font-size:11px">' + esc(ev.startTime) + '</span>' : ''}${ds ? '<br><span class="deadline-warn ' + (ds.type === 'passed' ? 'deadline-passed' : '') + '" style="margin-top:3px;font-size:10px">' + ds.text + '</span>' : ''}</td>
+      <td><strong>${esc(ev.naam || '(geen naam)')}</strong>${ev.organisator ? '<br><span style="color:var(--text-muted);font-size:11px">' + esc(ev.organisator) + '</span>' : ''}${typeLabels ? '<br><span style="margin-top:3px;display:inline-block">' + typeLabels + '</span>' : ''}</td>
       <td>${esc(ev.locatie || '—')}</td>
       <td><span class="vakgebied vg-${ev.vakgebied || 'Algemeen'}">${ev.vakgebied || 'Algemeen'}</span></td>
       <td>${team || '<span style="color:var(--text-subtle);font-size:11px">niet toegewezen</span>'}</td>
@@ -911,6 +962,7 @@ function openEventModal(eventId, prefilledDate) {
     ? { id: nid(), naam: '', startDate: prefilledDate || new Date().toISOString().slice(0,10),
         endDate: '', startTime: '', endTime: '', locatie: '', organisator: '',
         vakgebied: 'Algemeen', status: 'Gepland', toegewezen: [], website: '', notities: '',
+        type: '', vorm: '', deadline: '', kosten: '', pe: '', themaTags: [],
         aangemaaktDoor: state.currentUser, aangemaaktOp: new Date().toISOString() }
     : { ...state.events.find(e => e.id === eventId) };
   let editing = isNew && isAdmin();
@@ -927,11 +979,25 @@ function openEventModal(eventId, prefilledDate) {
           <div class="form-row"><label>Starttijd</label><input type="time" id="f-startTime" value="${ev.startTime || ''}"></div>
           <div class="form-row"><label>Eindtijd</label><input type="time" id="f-endTime" value="${ev.endTime || ''}"></div>
         </div>
+        <div class="form-row"><label>Inschrijfdeadline</label><input type="date" id="f-deadline" value="${ev.deadline || ''}"></div>
         <div class="form-row"><label>Locatie</label><input id="f-locatie" value="${esc(ev.locatie)}" placeholder="bv. RAI Amsterdam"></div>
         <div class="form-row"><label>Organisator</label><input id="f-organisator" value="${esc(ev.organisator)}" placeholder="bv. NEPROM"></div>
         <div class="form-grid">
+          <div class="form-row"><label>Type evenement</label><select id="f-type"><option value="">— kies —</option>${TYPES.map(t => `<option ${ev.type === t ? 'selected' : ''}>${t}</option>`).join('')}</select></div>
+          <div class="form-row"><label>Vorm</label><select id="f-vorm"><option value="">— kies —</option>${VORMEN.map(v => `<option ${ev.vorm === v ? 'selected' : ''}>${v}</option>`).join('')}</select></div>
+        </div>
+        <div class="form-grid">
           <div class="form-row"><label>Vakgebied</label><select id="f-vakgebied">${VAKGEBIEDEN.map(v => `<option ${ev.vakgebied === v ? 'selected' : ''}>${v}</option>`).join('')}</select></div>
           <div class="form-row"><label>Status</label><select id="f-status">${STATUSSEN.map(s => `<option ${ev.status === s ? 'selected' : ''}>${s}</option>`).join('')}</select></div>
+        </div>
+        <div class="form-row"><label>Thema-tags</label>
+          <div class="checkbox-group" id="f-tags">
+            ${THEMA_TAGS.map(t => `<label class="${(ev.themaTags || []).includes(t) ? 'checked' : ''}"><input type="checkbox" value="${t}" ${(ev.themaTags || []).includes(t) ? 'checked' : ''}>${t}</label>`).join('')}
+          </div>
+        </div>
+        <div class="form-grid">
+          <div class="form-row"><label>Kosten deelname</label><input id="f-kosten" value="${esc(ev.kosten)}" placeholder="bv. €295 (gratis voor leden)"></div>
+          <div class="form-row"><label>PE-punten / certificering</label><input id="f-pe" value="${esc(ev.pe)}" placeholder="bv. 3 PE-punten Stedebouw"></div>
         </div>
         <div class="form-row"><label>Toegewezen aan</label>
           <div class="checkbox-group" id="f-toegewezen">
@@ -944,6 +1010,9 @@ function openEventModal(eventId, prefilledDate) {
       body.querySelectorAll('#f-toegewezen input').forEach(cb => {
         cb.onchange = () => cb.parentElement.classList.toggle('checked', cb.checked);
       });
+      body.querySelectorAll('#f-tags input').forEach(cb => {
+        cb.onchange = () => cb.parentElement.classList.toggle('checked', cb.checked);
+      });
     } else {
       const collegas = (ev.toegewezen || []).map(id => {
         const c = getCollega(id);
@@ -951,16 +1020,24 @@ function openEventModal(eventId, prefilledDate) {
         const col = teamColor(id);
         return `<span class="person-chip"><span class="avatar" style="background:${col.border}">${esc(c.initialen)}</span>${esc(c.naam)}</span>`;
       }).join(' ') || '<span style="color:var(--text-subtle)">— nog niemand toegewezen</span>';
+      const tags = (ev.themaTags || []).map(t => `<span class="tag-chip tag-active">${esc(t)}</span>`).join(' ');
+      const ds = deadlineStatus(ev.deadline);
       const ad = getCollega(ev.aangemaaktDoor);
       body.innerHTML = `
         <div style="margin-bottom:16px">
           <span class="vakgebied vg-${ev.vakgebied || 'Algemeen'}">${ev.vakgebied || 'Algemeen'}</span>
           <span class="badge badge-${ev.status}" style="margin-left:6px">${ev.status}</span>
+          ${ev.type ? `<span class="type-label" style="margin-left:6px">${esc(ev.type)}</span>` : ''}
+          ${ev.vorm ? `<span class="vorm-label" style="margin-left:6px">${esc(ev.vorm)}</span>` : ''}
         </div>
         <div class="detail-row"><div class="label">Datum</div><div>${fmtDate(ev.startDate)}${ev.endDate && ev.endDate !== ev.startDate ? ' — ' + fmtDate(ev.endDate) : ''}</div></div>
         ${ev.startTime ? `<div class="detail-row"><div class="label">Tijd</div><div>${esc(ev.startTime)}${ev.endTime ? ' – ' + esc(ev.endTime) : ''}</div></div>` : ''}
+        ${ev.deadline ? `<div class="detail-row"><div class="label">Inschrijfdeadline</div><div>${fmtDate(ev.deadline)}${ds ? ` <span class="deadline-warn ${ds.type === 'passed' ? 'deadline-passed' : ''}" style="margin-left:6px">${ds.text}</span>` : ''}</div></div>` : ''}
         <div class="detail-row"><div class="label">Locatie</div><div>${esc(ev.locatie || '—')}</div></div>
         <div class="detail-row"><div class="label">Organisator</div><div>${esc(ev.organisator || '—')}</div></div>
+        ${tags ? `<div class="detail-row"><div class="label">Thema-tags</div><div>${tags}</div></div>` : ''}
+        ${ev.kosten ? `<div class="detail-row"><div class="label">Kosten</div><div>${esc(ev.kosten)}</div></div>` : ''}
+        ${ev.pe ? `<div class="detail-row"><div class="label">PE-punten</div><div>${esc(ev.pe)}</div></div>` : ''}
         <div class="detail-row"><div class="label">Wie gaat erheen</div><div>${collegas}</div></div>
         ${ev.website ? `<div class="detail-row"><div class="label">Website</div><div><a href="${esc(ev.website)}" target="_blank" rel="noopener" style="color:var(--accent)">${esc(ev.website)}</a></div></div>` : ''}
         ${ev.notities ? `<div class="detail-row"><div class="label">Notities</div><div style="white-space:pre-wrap">${esc(ev.notities)}</div></div>` : ''}
@@ -985,13 +1062,19 @@ function openEventModal(eventId, prefilledDate) {
         ev.endDate = $('f-endDate').value;
         ev.startTime = $('f-startTime').value;
         ev.endTime = $('f-endTime').value;
+        ev.deadline = $('f-deadline').value;
         ev.locatie = $('f-locatie').value.trim();
         ev.organisator = $('f-organisator').value.trim();
         ev.vakgebied = $('f-vakgebied').value;
         ev.status = $('f-status').value;
+        ev.type = $('f-type').value;
+        ev.vorm = $('f-vorm').value;
+        ev.kosten = $('f-kosten').value.trim();
+        ev.pe = $('f-pe').value.trim();
         ev.website = $('f-website').value.trim();
         ev.notities = $('f-notities').value;
         ev.toegewezen = Array.from(document.querySelectorAll('#f-toegewezen input:checked')).map(cb => cb.value);
+        ev.themaTags = Array.from(document.querySelectorAll('#f-tags input:checked')).map(cb => cb.value);
         if (isNew) state.events.push(ev);
         else { const idx = state.events.findIndex(e => e.id === ev.id); if (idx >= 0) state.events[idx] = ev; }
         markChanged();
@@ -1050,9 +1133,12 @@ $('list-search').oninput = e => { state.listSearch = e.target.value; renderList(
 $('list-sort').onchange = e => { state.listSort = e.target.value; renderList(); };
 
 $('btn-export-csv').onclick = () => {
-  const headers = ['Naam','Startdatum','Einddatum','Starttijd','Eindtijd','Locatie','Organisator','Vakgebied','Status','Toegewezen','Website','Notities'];
+  const headers = ['Naam','Startdatum','Einddatum','Starttijd','Eindtijd','Inschrijfdeadline','Locatie','Organisator','Type','Vorm','Vakgebied','Status','Thema-tags','Kosten','PE-punten','Toegewezen','Website','Notities'];
   const rows = state.events.map(e => [
-    e.naam, e.startDate, e.endDate, e.startTime, e.endTime, e.locatie, e.organisator, e.vakgebied, e.status,
+    e.naam, e.startDate, e.endDate, e.startTime, e.endTime, e.deadline,
+    e.locatie, e.organisator, e.type, e.vorm, e.vakgebied, e.status,
+    (e.themaTags || []).join('; '),
+    e.kosten, e.pe,
     (e.toegewezen || []).map(id => getCollega(id)?.naam || '').join('; '),
     e.website, (e.notities || '').replace(/\n/g, ' ')
   ]);
