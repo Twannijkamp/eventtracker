@@ -1,0 +1,1416 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<title>Event Tracker — Planeconomie & Vastgoed</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  :root {
+    --bg: #FAFAF7;
+    --surface: #FFFFFF;
+    --border: #E5E5E0;
+    --border-strong: #D0D0C8;
+    --text: #1A1A1A;
+    --text-muted: #6B6B66;
+    --text-subtle: #9A9A95;
+    --accent: #185FA5;
+    --accent-bg: #E6F1FB;
+    --success: #0F6E56;
+    --success-bg: #E1F5EE;
+    --warning: #854F0B;
+    --warning-bg: #FAEEDA;
+    --danger: #A32D2D;
+    --danger-bg: #FCEBEB;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+    font-size: 14px;
+  }
+  .app { max-width: 1400px; margin: 0 auto; padding: 24px; }
+  header.top {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 20px; padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap; gap: 12px;
+  }
+  header.top h1 { font-size: 20px; font-weight: 500; margin: 0; }
+  header.top .subtitle { color: var(--text-muted); font-size: 13px; margin-top: 2px; }
+  .user-bar { display: flex; align-items: center; gap: 10px; font-size: 13px; flex-wrap: wrap; }
+  .user-bar select, .user-bar button {
+    padding: 6px 10px; border: 1px solid var(--border-strong);
+    border-radius: 6px; background: var(--surface); font-size: 13px;
+    color: var(--text); font-family: inherit; cursor: pointer;
+  }
+  .user-bar button:hover { background: var(--bg); }
+  .role-badge {
+    font-size: 11px; padding: 3px 9px; border-radius: 12px; font-weight: 500;
+  }
+  .role-admin { background: var(--accent-bg); color: #042C53; }
+  .role-viewer { background: #F1EFE8; color: #2C2C2A; }
+
+  .banner {
+    border-radius: 8px; padding: 10px 14px; margin-bottom: 16px;
+    font-size: 13px; display: flex; align-items: center; gap: 10px;
+  }
+  .banner-info { background: var(--accent-bg); color: #042C53; border: 1px solid #B5D4F4; }
+  .banner-warn { background: var(--warning-bg); color: #412402; border: 1px solid #FAC775; }
+  .banner-success { background: var(--success-bg); color: #04342C; border: 1px solid #9FE1CB; }
+  .banner-icon {
+    flex-shrink: 0; width: 18px; height: 18px;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-weight: 500;
+  }
+
+  .tabs {
+    display: flex; gap: 4px; margin-bottom: 20px;
+    border-bottom: 1px solid var(--border); flex-wrap: wrap;
+  }
+  .tab {
+    padding: 10px 16px; border: none; background: transparent;
+    cursor: pointer; font-size: 14px; color: var(--text-muted);
+    border-bottom: 2px solid transparent; margin-bottom: -1px;
+    font-family: inherit;
+  }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 500; }
+  .tab:hover:not(.active) { color: var(--text); }
+
+  .stats-row {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px; margin-bottom: 20px;
+  }
+  .stat-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 12px 14px;
+  }
+  .stat-card .label { font-size: 12px; color: var(--text-muted); }
+  .stat-card .value { font-size: 22px; font-weight: 500; margin-top: 2px; }
+  .stat-clickable { cursor: pointer; transition: background 0.15s; }
+  .stat-clickable:hover { background: var(--bg); }
+
+  .toolbar {
+    display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
+    margin-bottom: 16px;
+  }
+  .toolbar input, .toolbar select {
+    padding: 8px 10px; border: 1px solid var(--border-strong);
+    border-radius: 6px; background: var(--surface); font-size: 13px;
+    color: var(--text); font-family: inherit;
+  }
+  .toolbar input { min-width: 220px; }
+  .btn {
+    padding: 8px 14px; border: 1px solid var(--border-strong);
+    border-radius: 6px; background: var(--surface); cursor: pointer;
+    font-size: 13px; color: var(--text); font-family: inherit;
+  }
+  .btn:hover { background: var(--bg); }
+  .btn[disabled] { opacity: 0.5; cursor: not-allowed; }
+  .btn-primary {
+    background: var(--accent); color: white; border-color: var(--accent);
+  }
+  .btn-primary:hover { background: #144E89; }
+  .btn-success {
+    background: var(--success); color: white; border-color: var(--success);
+  }
+  .btn-success:hover { background: #0B5A47; }
+  .btn-danger { color: var(--danger); }
+  .btn-danger:hover { background: var(--danger-bg); }
+
+  .mode-toggle {
+    display: inline-flex; border: 1px solid var(--border-strong);
+    border-radius: 6px; overflow: hidden;
+  }
+  .mode-toggle button {
+    padding: 7px 12px; border: none; background: var(--surface);
+    cursor: pointer; font-size: 13px; color: var(--text-muted);
+    font-family: inherit;
+  }
+  .mode-toggle button.on { background: var(--accent-bg); color: #042C53; font-weight: 500; }
+  .mode-toggle button + button { border-left: 1px solid var(--border-strong); }
+
+  .calendar-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 12px; flex-wrap: wrap; gap: 8px;
+  }
+  .calendar-header h2 { font-size: 18px; font-weight: 500; margin: 0; }
+  .calendar-nav { display: flex; gap: 6px; }
+  .calendar {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; overflow: hidden;
+  }
+  .cal-weekdays {
+    display: grid; grid-template-columns: repeat(7, 1fr);
+    background: var(--bg); border-bottom: 1px solid var(--border);
+  }
+  .cal-weekdays div {
+    padding: 8px; text-align: center; font-size: 12px;
+    color: var(--text-muted); font-weight: 500;
+  }
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); }
+  .cal-cell {
+    min-height: 96px; border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border); padding: 6px;
+    position: relative; cursor: pointer; background: var(--surface);
+  }
+  .cal-cell:nth-child(7n) { border-right: none; }
+  .cal-cell.other-month { background: var(--bg); color: var(--text-subtle); }
+  .cal-cell.today { background: var(--accent-bg); }
+  .cal-cell .daynum { font-size: 12px; font-weight: 500; }
+  .cal-cell:hover { background: var(--bg); }
+  .cal-cell.today:hover { background: #D8E8F7; }
+  .cal-event {
+    margin-top: 3px; padding: 2px 6px; font-size: 11px;
+    border-radius: 3px; cursor: pointer;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    border-left-width: 3px; border-left-style: solid;
+  }
+  .cal-event.cancelled { text-decoration: line-through; }
+
+  .legend {
+    display: flex; gap: 12px; flex-wrap: wrap;
+    font-size: 11px; color: var(--text-muted); margin: 8px 0 16px;
+  }
+  .legend-item { display: inline-flex; align-items: center; gap: 5px; }
+  .legend-swatch { width: 10px; height: 10px; border-radius: 2px; }
+
+  .table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; overflow: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); }
+  th { background: var(--bg); font-weight: 500; font-size: 12px; color: var(--text-muted); }
+  tr:last-child td { border-bottom: none; }
+  tr.row-clickable:hover { background: var(--bg); cursor: pointer; }
+
+  .badge {
+    display: inline-block; padding: 2px 8px; border-radius: 10px;
+    font-size: 11px; font-weight: 500;
+  }
+  .badge-Nieuw { background: var(--accent-bg); color: #042C53; }
+  .badge-Niet { background: #F4F2EE; color: #3A3833; border: 1px solid #D6D0C6; }
+  .badge-Ingepland { background: var(--success-bg); color: #04342C; }
+  .badge-Geweest { background: #F1EFE8; color: #2C2C2A; }
+  .badge-Geannuleerd { background: var(--danger-bg); color: #501313; }
+
+  .type-label { font-size: 11px; padding: 2px 7px; border-radius: 4px; display: inline-block; margin-right: 3px; background: #E6F1FB; color: #042C53; border: 1px solid #B5D4F4; }
+  .vorm-label { font-size: 11px; padding: 2px 7px; border-radius: 4px; display: inline-block; margin-right: 3px; background: #F1EFE8; color: #2C2C2A; }
+
+  .tag-chip {
+    display: inline-block; padding: 2px 8px; border-radius: 10px;
+    font-size: 11px; margin-right: 3px; margin-bottom: 2px;
+    background: var(--bg); border: 1px solid var(--border-strong); color: var(--text-muted);
+  }
+  .tag-chip.tag-active { background: var(--accent-bg); border-color: var(--accent); color: #042C53; }
+
+  .deadline-warn {
+    display: inline-block; font-size: 11px; padding: 2px 7px;
+    border-radius: 4px; background: var(--warning-bg); color: #412402;
+    border: 1px solid #FAC775; font-weight: 500;
+  }
+  .deadline-passed {
+    background: var(--danger-bg); color: #501313; border-color: #F4B0B0;
+  }
+
+  .person-chip {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: var(--bg); border: 1px solid var(--border);
+    padding: 2px 8px; border-radius: 12px; font-size: 11px;
+    margin-right: 3px; margin-bottom: 2px;
+  }
+  .avatar {
+    width: 18px; height: 18px; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 500; color: white;
+  }
+
+  .modal-backdrop {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 100; padding: 20px;
+  }
+  .modal {
+    background: var(--surface); border-radius: 12px;
+    max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  }
+  .modal.modal-sm { max-width: 420px; }
+  .modal-header {
+    padding: 16px 20px; border-bottom: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .modal-header h3 { margin: 0; font-size: 16px; font-weight: 500; }
+  .modal-body { padding: 20px; }
+  .modal-footer {
+    padding: 12px 20px; border-top: 1px solid var(--border);
+    display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap;
+  }
+  .form-row { margin-bottom: 14px; }
+  .form-row label {
+    display: block; font-size: 12px; font-weight: 500;
+    margin-bottom: 4px; color: var(--text-muted);
+  }
+  .form-row input, .form-row select, .form-row textarea {
+    width: 100%; padding: 8px 10px; border: 1px solid var(--border-strong);
+    border-radius: 6px; font-size: 13px; font-family: inherit;
+    background: var(--surface); color: var(--text);
+  }
+  .form-row textarea { min-height: 60px; resize: vertical; }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .checkbox-group {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    padding: 8px; border: 1px solid var(--border-strong); border-radius: 6px;
+    background: var(--bg);
+  }
+  .checkbox-group label {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: var(--surface); padding: 4px 10px; border-radius: 12px;
+    font-size: 12px; cursor: pointer; border: 1px solid var(--border);
+    margin: 0;
+  }
+  .checkbox-group input { width: auto; margin: 0; }
+  .checkbox-group label.checked { background: var(--accent-bg); border-color: var(--accent); color: #042C53; }
+
+  .detail-row {
+    display: grid; grid-template-columns: 130px 1fr;
+    gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .detail-row:last-child { border-bottom: none; }
+  .detail-row .label { color: var(--text-muted); }
+
+  .empty {
+    text-align: center; padding: 60px 20px; color: var(--text-muted);
+  }
+  .loading {
+    text-align: center; padding: 40px; color: var(--text-muted);
+  }
+  .save-status {
+    font-size: 12px; color: var(--text-muted); padding: 4px 8px;
+  }
+  .pending-changes {
+    background: var(--warning-bg); color: #412402;
+    padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 500;
+    border: 1px solid #FAC775;
+  }
+  .help-content h2 { font-size: 18px; font-weight: 500; margin: 24px 0 8px; }
+  .help-content h2:first-child { margin-top: 0; }
+  .help-content h3 { font-size: 15px; font-weight: 500; margin: 16px 0 6px; }
+  .help-content code {
+    background: var(--bg); padding: 2px 6px; border-radius: 3px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 12px;
+  }
+  .help-content ul, .help-content ol { padding-left: 22px; line-height: 1.7; }
+  .help-content li { margin-bottom: 4px; }
+  .help-content p { line-height: 1.7; }
+  .help-section { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 24px; }
+  .tab-badge {
+    display: inline-block; margin-left: 4px; background: #C2410C; color: white;
+    font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 10px;
+    line-height: 1.4; min-width: 18px; text-align: center;
+  }
+  .tab.active .tab-badge { background: var(--accent); }
+
+  /* Nieuw-pagina */
+  .nieuw-banner {
+    background: linear-gradient(135deg, #FFEDE0, #FFF6EF);
+    border: 1px solid #F5C9A0; border-radius: 10px;
+    padding: 16px 20px; margin-bottom: 20px;
+  }
+  .nieuw-banner h2 { margin: 0 0 4px; font-size: 16px; font-weight: 600; color: #7A2E0A; }
+  .nieuw-banner p { margin: 0; font-size: 13px; color: #8A4218; line-height: 1.5; }
+  .nieuw-grid { display: flex; flex-direction: column; gap: 12px; }
+  .nieuw-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-left: 4px solid #C2410C; border-radius: 8px; padding: 16px 20px;
+  }
+  .nieuw-card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+  .nieuw-card-title { font-size: 15px; font-weight: 600; margin: 0 0 4px; }
+  .nieuw-card-meta { font-size: 12.5px; color: var(--text-muted); display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .nieuw-card-meta .sep { color: var(--border-strong); }
+  .nieuw-card-desc { font-size: 13px; color: var(--text-muted); margin-top: 8px; line-height: 1.6; }
+  .nieuw-card-actions {
+    display: flex; gap: 8px; margin-top: 12px; padding-top: 12px;
+    border-top: 1px solid var(--border); align-items: center; flex-wrap: wrap;
+  }
+  .nieuw-status-btn {
+    font-size: 12px; padding: 5px 12px; border-radius: 6px;
+    border: 1px solid var(--border-strong); background: var(--surface);
+    cursor: pointer; color: var(--text-muted); font-family: inherit; font-weight: 500;
+  }
+  .nieuw-status-btn:hover { border-color: var(--text); color: var(--text); }
+  .nieuw-status-btn.s-ingepland { background: var(--success-bg); color: #04342C; border-color: #0F6E56; }
+  .nieuw-status-btn.s-niet { background: #F4F2EE; color: #3A3833; border-color: #857D70; }
+  .nieuw-empty {
+    text-align: center; padding: 60px 20px; color: var(--text-muted);
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+  }
+  .nieuw-empty .big-check { font-size: 40px; margin-bottom: 12px; }
+  .new-flag {
+    background: #FFEDE0; color: #C2410C; font-size: 10.5px; font-weight: 700;
+    padding: 2px 8px; border-radius: 10px; text-transform: uppercase; letter-spacing: 0.04em;
+  }
+
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div>
+      <h1>Event Tracker — Planeconomie &amp; Vastgoed</h1>
+      <div class="subtitle">Gedeeld overzicht van vakevenementen</div>
+    </div>
+    <div class="user-bar">
+      <span class="save-status" id="save-status">Klaar</span>
+      <span id="role-badge"></span>
+      <span id="pending-badge" class="pending-changes hidden">Niet gepubliceerd</span>
+      <button id="role-btn"></button>
+    </div>
+  </header>
+
+  <div id="banner-host"></div>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="calendar">Kalender</button>
+    <button class="tab" data-tab="nieuw">Nieuw <span id="nieuw-badge" class="tab-badge hidden">0</span></button>
+    <button class="tab" data-tab="list">Lijstweergave</button>
+    <button class="tab" data-tab="team">Team</button>
+    <button class="tab" data-tab="publish" id="tab-publish">Publiceren</button>
+    <button class="tab" data-tab="help">Handleiding</button>
+  </div>
+
+  <div id="loading" class="loading">Gegevens laden…</div>
+
+  <div id="content" class="hidden">
+    <div class="stats-row" id="stats"></div>
+
+    <div id="view-calendar">
+      <div class="toolbar">
+        <button class="btn btn-primary" id="btn-new-event">+ Nieuw evenement</button>
+        <select id="filter-collega"></select>
+        <select id="filter-status">
+          <option value="">Alle statussen</option>
+          <option>Ingepland</option><option>Niet aanwezig</option>
+          <option>Geweest</option><option>Geannuleerd</option>
+        </select>
+        <select id="filter-type">
+          <option value="">Alle types</option>
+        </select>
+        <select id="filter-tag">
+          <option value="">Alle thema's</option>
+        </select>
+        <span style="font-size:12px;color:var(--text-muted);margin-left:6px">Kleur:</span>
+        <div class="mode-toggle" id="color-mode">
+          <button data-mode="status" class="on">Per status</button>
+          <button data-mode="collega">Per collega</button>
+        </div>
+      </div>
+
+      <div class="calendar-header">
+        <h2 id="cal-title">—</h2>
+        <div class="calendar-nav">
+          <button class="btn" id="cal-prev">‹ Vorige</button>
+          <button class="btn" id="cal-today">Vandaag</button>
+          <button class="btn" id="cal-next">Volgende ›</button>
+        </div>
+      </div>
+      <div class="legend" id="legend"></div>
+      <div class="calendar">
+        <div class="cal-weekdays" id="cal-weekdays"></div>
+        <div class="cal-grid" id="cal-grid"></div>
+      </div>
+    </div>
+
+    <div id="view-nieuw" class="hidden">
+      <div class="nieuw-banner">
+        <h2>🆕 Nog te bespreken evenementen</h2>
+        <p>Evenementen die nieuw in de database zijn toegevoegd. Bekijk samen tijdens het maandoverleg: wie gaat ernaartoe? Wijs collega's toe of markeer als <strong>Niet aanwezig</strong>. Pas wanneer je hier kiest, verschijnt het evenement in de kalender.</p>
+      </div>
+      <div class="nieuw-grid" id="nieuw-grid"></div>
+    </div>
+
+    <div id="view-list" class="hidden">
+      <div class="toolbar">
+        <input type="search" id="list-search" placeholder="Zoeken op naam, locatie, organisator…">
+        <select id="list-sort">
+          <option value="date-asc">Datum oplopend</option>
+          <option value="date-desc">Datum aflopend</option>
+          <option value="naam">Naam A-Z</option>
+        </select>
+        <button class="btn" id="btn-export-csv">Exporteer CSV</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Datum</th><th>Evenement</th><th>Locatie</th>
+              <th>Thema's</th><th>Toegewezen</th><th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="event-list"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="view-team" class="hidden">
+      <div class="toolbar" id="team-toolbar">
+        <input id="new-collega-name" placeholder="Naam nieuwe collega">
+        <input id="new-collega-init" placeholder="Initialen (bv. JD)" style="min-width:120px">
+        <button class="btn btn-primary" id="btn-add-collega">+ Collega toevoegen</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Collega</th><th>Kleur</th><th>Toegewezen evenementen</th><th>Acties</th></tr></thead>
+          <tbody id="team-list"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="view-publish" class="hidden">
+      <div class="help-section">
+        <h2>Publiceren naar GitHub</h2>
+        <p>Wanneer je wijzigingen hebt aangebracht, exporteer dan het databestand en upload het naar je
+        GitHub-repository. Je collega's zien de wijzigingen zodra ze de pagina herladen.</p>
+
+        <div id="publish-status" style="margin: 16px 0;"></div>
+
+        <h3>Stap 1 — Exporteer het databestand</h3>
+        <p>Klik op de knop hieronder. Er wordt een bestand <code>data.json</code> gedownload.</p>
+        <button class="btn btn-success" id="btn-export-data" style="margin-bottom: 8px">⬇ Exporteer data.json</button>
+
+        <h3>Stap 2 — Upload naar GitHub</h3>
+        <ol>
+          <li>Open je GitHub-repository in de browser.</li>
+          <li>Klik op het bestaande <code>data.json</code> bestand.</li>
+          <li>Klik op het potlood-icoon (Edit) of op <code>Upload files</code> en sleep het nieuwe <code>data.json</code> erin.</li>
+          <li>Onderaan: klik <code>Commit changes</code>.</li>
+        </ol>
+        <p>Klaar — binnen ongeveer een minuut staat de bijgewerkte versie online.</p>
+
+        <h3>Importeer extern bestand (optioneel)</h3>
+        <p>Werk je vanaf een andere laptop? Importeer dan het laatste <code>data.json</code> uit GitHub om door te werken op de actuele versie.</p>
+        <input type="file" id="file-import" accept="application/json" style="display:none">
+        <button class="btn" id="btn-import-data">Importeer data.json</button>
+        <button class="btn btn-danger" id="btn-clear-data" style="float:right">Wis lokale data</button>
+      </div>
+    </div>
+
+    <div id="view-help" class="hidden help-content">
+      <div class="help-section">
+        <h2>Hoe werkt deze tool?</h2>
+        <p>Een gedeeld overzicht voor het bijhouden van vakevenementen — beurzen, conferenties, congressen,
+        bijeenkomsten — op het gebied van planeconomie, gemeentelijk grondbeleid en vastgoedrekenen.</p>
+
+        <h2>Rolmodel</h2>
+        <p><strong>Beheerder</strong> — kan evenementen aanmaken, bewerken en verwijderen, en het team beheren. Vereist een wachtwoord.</p>
+        <p><strong>Kijker</strong> — ziet de kalender, lijst en details. Geen wachtwoord nodig. Standaardmodus.</p>
+        <p>De rol bepaalt alleen wat je kunt doen in de interface; gepubliceerde data is voor iedereen die de URL kent zichtbaar.</p>
+
+        <h2>Statussen en wat ze betekenen</h2>
+        <p>Een evenement kan vijf statussen hebben:</p>
+        <ul>
+          <li><strong>Nieuw</strong> — recent toegevoegd, nog niet besproken door het team. Verschijnt op het tabblad <strong>Nieuw</strong> en is nog niet zichtbaar in de kalender.</li>
+          <li><strong>Ingepland</strong> — er gaat iemand naartoe (eventueel meerdere collega's). Verschijnt in de kalender.</li>
+          <li><strong>Niet aanwezig</strong> — het team kiest bewust om niet te gaan. Het evenement blijft zichtbaar in de kalender en lijstweergave, zodat het niet als 'Nieuw' terug blijft komen.</li>
+          <li><strong>Geweest</strong> — de datum is voorbij. Dit gebeurt automatisch op basis van vandaag.</li>
+          <li><strong>Geannuleerd</strong> — het evenement gaat niet door (door de organisator afgelast of uitgesteld).</li>
+        </ul>
+
+        <h2>Nieuwe evenementen bespreken</h2>
+        <p>Het tabblad <strong>Nieuw</strong> bevat alle evenementen die nog niet besproken zijn. Tijdens een teamoverleg loop je dit overzicht langs en kies je per evenement:</p>
+        <ul>
+          <li>Wie van het team gaat erheen → klik op één of meer collega's en zet de status op <strong>Ingepland</strong></li>
+          <li>Niemand kan/wil gaan → zet de status op <strong>Niet aanwezig</strong></li>
+        </ul>
+        <p>Zodra een evenement uit de 'Nieuw'-status is gehaald, verdwijnt het uit dit tabblad en verschijnt het in de kalender.</p>
+
+        <h2>Kleurmodi in de kalender</h2>
+        <p><strong>Per status</strong> — laat zien wat de stand van zaken is per evenement.</p>
+        <p><strong>Per collega</strong> — geeft elke collega een eigen kleur. Bij meerdere toegewezen
+        collega's wordt de kleur van de eerste persoon gebruikt — alle namen blijven zichtbaar in de
+        detailweergave.</p>
+
+        <h2>Wijzigingen publiceren</h2>
+        <p>Deze tool bewaart wijzigingen tijdelijk in jouw browser. Om ze voor je collega's beschikbaar
+        te maken, moet je ze publiceren via het <strong>Publiceren</strong>-tabblad. Je downloadt
+        <code>data.json</code> en uploadt dat naar GitHub. Daarna ziet iedereen die de pagina opnieuw
+        opent de nieuwe versie.</p>
+
+        <h2>Wachtwoord wijzigen</h2>
+        <p>Het standaardwachtwoord is bij eerste installatie ingesteld in het bestand zelf
+        (zie de installatiehandleiding). Wijzigen kan in de broncode van het HTML-bestand:
+        zoek de regel met <code>const ADMIN_PASSWORD</code> en vervang de waarde.</p>
+
+        <h2>Velden per evenement</h2>
+        <ul>
+          <li>Naam, start- en einddatum, start- en eindtijd</li>
+          <li>Locatie, organisator, website</li>
+          <li>Type, vorm en status</li>
+          <li>Thema-tags (meerdere mogelijk)</li>
+          <li>Toegewezen collega's (meerdere mogelijk)</li>
+          <li>Vrije notities</li>
+        </ul>
+
+        <h2>Aanpassen van thema-tags of statussen</h2>
+        <p>Open <code>index.html</code> in een teksteditor en zoek de regels:</p>
+        <p><code>const THEMA_TAGS = [...]</code><br><code>const STATUSSEN = [...]</code></p>
+        <p>Pas deze lijsten aan, sla op, en upload het bestand opnieuw naar GitHub.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="event-modal" class="modal-backdrop hidden">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modal-title">Evenement</h3>
+      <button class="btn" id="modal-close" style="padding: 4px 10px">×</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-footer" id="modal-footer"></div>
+  </div>
+</div>
+
+<div id="login-modal" class="modal-backdrop hidden">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <h3>Inloggen als beheerder</h3>
+      <button class="btn" id="login-close" style="padding: 4px 10px">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <label>Wachtwoord</label>
+        <input type="password" id="login-pw" autocomplete="current-password">
+      </div>
+      <div id="login-err" style="color: var(--danger); font-size: 12px; display: none">Onjuist wachtwoord.</div>
+    </div>
+    <div class="modal-footer">
+      <div></div>
+      <div style="display:flex; gap:8px">
+        <button class="btn" id="login-cancel">Annuleer</button>
+        <button class="btn btn-primary" id="login-ok">Inloggen</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const ADMIN_PASSWORD = "Beheerder2026";
+
+const STATUSSEN = ['Nieuw','Ingepland','Niet aanwezig','Geweest','Geannuleerd'];
+// Statussen die in de kalender getoond worden (Nieuw verbergen — die staan op 'Nieuw'-tabblad)
+const KALENDER_STATUSSEN = ['Ingepland','Niet aanwezig','Geweest','Geannuleerd'];
+const TYPES = ['Webinar','Congres','Cursus','Excursie','Bijeenkomst','Beurs'];
+const VORMEN = ['Fysiek','Online','Hybride'];
+const THEMA_TAGS = ['BBV','Grondbeleid','Planeconomie','Kostenverhaal','Omgevingswet','Woningbouw','Civieltechniek','Infra','Stedelijke transformatie'];
+const STATUS_COLORS = {
+  'Nieuw':           { bg: '#E6F1FB', fg: '#042C53', border: '#185FA5' },
+  'Ingepland':       { bg: '#E1F5EE', fg: '#04342C', border: '#0F6E56' },
+  'Niet aanwezig':   { bg: '#F4F2EE', fg: '#3A3833', border: '#857D70' },
+  'Geweest':         { bg: '#F1EFE8', fg: '#2C2C2A', border: '#888780' },
+  'Geannuleerd':     { bg: '#FCEBEB', fg: '#501313', border: '#A32D2D' }
+};
+const PALETTE = [
+  { bg: '#EEEDFE', fg: '#26215C', border: '#534AB7' },
+  { bg: '#E1F5EE', fg: '#04342C', border: '#0F6E56' },
+  { bg: '#FAECE7', fg: '#4A1B0C', border: '#993C1D' },
+  { bg: '#FBEAF0', fg: '#4B1528', border: '#993556' },
+  { bg: '#E6F1FB', fg: '#042C53', border: '#185FA5' },
+  { bg: '#FAEEDA', fg: '#412402', border: '#BA7517' },
+  { bg: '#FCEBEB', fg: '#501313', border: '#A32D2D' },
+  { bg: '#EAF3DE', fg: '#173404', border: '#3B6D11' }
+];
+const LOCAL_STORAGE_KEY = 'eventTracker_localData_v1';
+const LOCAL_DIRTY_KEY = 'eventTracker_dirty_v1';
+
+let state = {
+  events: [],
+  team: [],
+  publishedTimestamp: null,
+  view: 'calendar',
+  calDate: new Date(),
+  filter: { collega: '', status: '', type: '', tag: '' },
+  listSearch: '',
+  listSort: 'date-asc',
+  role: 'viewer',
+  colorMode: 'status',
+  isDirty: false
+};
+
+const $ = id => document.getElementById(id);
+const SS = $('save-status');
+function setStatus(t) { SS.textContent = t; }
+function esc(s) { return (s == null ? '' : String(s)).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function nid() { return 'e' + Date.now() + '_' + Math.random().toString(36).slice(2, 7); }
+function fmtDate(s) {
+  if (!s) return '—';
+  const d = new Date(s + 'T00:00:00');
+  return d.toLocaleDateString('nl-NL', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+function fmtDateTime(iso) {
+  if (!iso) return '—';
+  return new Date(iso).toLocaleString('nl-NL', { dateStyle: 'medium', timeStyle: 'short' });
+}
+function getCollega(id) { return state.team.find(t => t.id === id); }
+function teamColor(id) {
+  const idx = state.team.findIndex(t => t.id === id);
+  return idx >= 0 ? PALETTE[idx % PALETTE.length] : PALETTE[0];
+}
+function isAdmin() { return state.role === 'admin'; }
+
+function statusClass(s) {
+  if (s === 'Niet aanwezig') return 'Niet';
+  return s;
+}
+
+function deadlineStatus(deadlineDate) {
+  if (!deadlineDate) return null;
+  const d = new Date(deadlineDate + 'T23:59:59');
+  const today = new Date(); today.setHours(0,0,0,0);
+  const diffDays = Math.floor((d - today) / (1000 * 60 * 60 * 24));
+  if (diffDays < 0) return { type: 'passed', text: 'Deadline verstreken' };
+  if (diffDays === 0) return { type: 'warn', text: 'Deadline vandaag!' };
+  if (diffDays <= 7) return { type: 'warn', text: 'Nog ' + diffDays + ' dag' + (diffDays === 1 ? '' : 'en') };
+  return null;
+}
+
+async function loadInitialData() {
+  setStatus('Laden…');
+  let publishedData = null;
+  try {
+    const resp = await fetch('data.json?cb=' + Date.now(), { cache: 'no-store' });
+    if (resp.ok) publishedData = await resp.json();
+  } catch (e) {}
+
+  let localData = null;
+  try {
+    const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
+    if (raw) localData = JSON.parse(raw);
+  } catch (e) {}
+  const isDirty = localStorage.getItem(LOCAL_DIRTY_KEY) === '1';
+
+  if (isDirty && localData) {
+    applyData(localData);
+    state.isDirty = true;
+  } else if (publishedData) {
+    applyData(publishedData);
+    state.isDirty = false;
+    saveLocal(false);
+  } else if (localData) {
+    applyData(localData);
+    state.isDirty = isDirty;
+  } else {
+    state.events = [];
+    state.team = [
+      { id: 't1', naam: 'Jan de Vries', initialen: 'JV' },
+      { id: 't2', naam: 'Marieke Bakker', initialen: 'MB' },
+      { id: 't3', naam: 'Pieter Jansen', initialen: 'PJ' }
+    ];
+    state.publishedTimestamp = null;
+  }
+  setStatus('Klaar');
+}
+
+function applyData(d) {
+  state.events = d.events || [];
+  state.team = d.team || [];
+  state.publishedTimestamp = d.publishedTimestamp || null;
+  // Migratie van legacy data: oude statussen en velden opschonen
+  state.events.forEach(ev => {
+    if (ev.status === 'Bespreken in vakgroep') ev.status = 'Nieuw';
+    if ('doel' in ev) delete ev.doel;
+  });
+  // Auto-status: evenementen die voorbij zijn → 'Geweest'
+  autoUpdatePastEvents();
+}
+
+// Markeer evenementen in het verleden automatisch als 'Geweest'
+// (tenzij ze al 'Geannuleerd' of 'Niet aanwezig' staan — die blijven zo)
+function autoUpdatePastEvents() {
+  const today = new Date().toISOString().slice(0, 10);
+  let changed = false;
+  state.events.forEach(ev => {
+    const endDate = ev.endDate || ev.startDate;
+    if (!endDate) return;
+    if (endDate < today && ev.status !== 'Geweest' && ev.status !== 'Geannuleerd' && ev.status !== 'Niet aanwezig') {
+      ev.status = 'Geweest';
+      changed = true;
+    }
+  });
+  return changed;
+}
+
+function saveLocal(markDirty) {
+  const data = {
+    events: state.events,
+    team: state.team,
+    publishedTimestamp: state.publishedTimestamp
+  };
+  try {
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data));
+    if (markDirty) {
+      state.isDirty = true;
+      localStorage.setItem(LOCAL_DIRTY_KEY, '1');
+    }
+  } catch (e) { console.error(e); }
+}
+
+function markChanged() {
+  saveLocal(true);
+  setStatus('Opgeslagen lokaal');
+  setTimeout(() => setStatus('Klaar'), 1200);
+  renderPendingBadge();
+}
+
+function renderPendingBadge() {
+  $('pending-badge').classList.toggle('hidden', !state.isDirty || !isAdmin());
+}
+
+function renderRoleUI() {
+  const banner = $('banner-host');
+  if (isAdmin()) {
+    if (state.isDirty) {
+      banner.innerHTML = `<div class="banner banner-warn"><span class="banner-icon">!</span><div>Je hebt niet-gepubliceerde wijzigingen. Ga naar het tabblad <strong>Publiceren</strong> om ze beschikbaar te maken voor collega's.</div></div>`;
+    } else {
+      banner.innerHTML = '';
+    }
+  } else {
+    banner.innerHTML = `<div class="banner banner-info"><span class="banner-icon">i</span><div>Kijkmodus — alleen-lezen. Klik rechtsboven op "Beheerdersmodus" om te bewerken.</div></div>`;
+  }
+
+  $('role-badge').innerHTML = isAdmin()
+    ? '<span class="role-badge role-admin">● Beheerder</span>'
+    : '<span class="role-badge role-viewer">● Kijker</span>';
+  const btn = $('role-btn');
+  btn.textContent = isAdmin() ? 'Naar kijkmodus' : 'Beheerdersmodus';
+  btn.onclick = isAdmin()
+    ? () => { state.role = 'viewer'; render(); }
+    : openLogin;
+
+  $('btn-new-event').disabled = !isAdmin();
+  $('tab-publish').classList.toggle('hidden', !isAdmin());
+  const tt = $('team-toolbar');
+  if (tt) tt.style.display = isAdmin() ? '' : 'none';
+}
+
+function openLogin() {
+  $('login-modal').classList.remove('hidden');
+  $('login-pw').value = '';
+  $('login-err').style.display = 'none';
+  setTimeout(() => $('login-pw').focus(), 50);
+}
+function closeLogin() { $('login-modal').classList.add('hidden'); }
+$('login-close').onclick = closeLogin;
+$('login-cancel').onclick = closeLogin;
+$('login-pw').onkeydown = e => { if (e.key === 'Enter') $('login-ok').click(); };
+$('login-ok').onclick = () => {
+  if ($('login-pw').value === ADMIN_PASSWORD) {
+    state.role = 'admin';
+    closeLogin();
+    render();
+  } else {
+    $('login-err').style.display = '';
+  }
+};
+$('login-modal').onclick = e => { if (e.target.id === 'login-modal') closeLogin(); };
+
+function renderFilters() {
+  const co = $('filter-collega');
+  co.innerHTML = '<option value="">Alle collega\'s</option>' +
+    '<option value="__unassigned__"' + (state.filter.collega === '__unassigned__' ? ' selected' : '') + '>— Niet toegewezen —</option>' +
+    state.team.map(t => `<option value="${t.id}" ${state.filter.collega === t.id ? 'selected' : ''}>${esc(t.naam)}</option>`).join('');
+  co.onchange = e => { state.filter.collega = e.target.value; render(); };
+  $('filter-status').value = state.filter.status;
+  $('filter-status').onchange = e => { state.filter.status = e.target.value; render(); };
+  const ft = $('filter-type');
+  ft.innerHTML = '<option value="">Alle types</option>' +
+    TYPES.map(t => `<option ${state.filter.type === t ? 'selected' : ''}>${t}</option>`).join('');
+  ft.onchange = e => { state.filter.type = e.target.value; render(); };
+  const fg = $('filter-tag');
+  fg.innerHTML = '<option value="">Alle thema\'s</option>' +
+    THEMA_TAGS.map(t => `<option ${state.filter.tag === t ? 'selected' : ''}>${t}</option>`).join('');
+  fg.onchange = e => { state.filter.tag = e.target.value; render(); };
+  document.querySelectorAll('#color-mode button').forEach(b => {
+    b.classList.toggle('on', b.dataset.mode === state.colorMode);
+    b.onclick = () => { state.colorMode = b.dataset.mode; render(); };
+  });
+}
+
+function renderStats() {
+  const total = state.events.length;
+  const today = new Date().toISOString().slice(0, 10);
+  const upcoming = state.events.filter(e => e.startDate >= today && e.status !== 'Geannuleerd').length;
+  const selectedCollega = state.filter.collega;
+  const isPersonSelected = selectedCollega && selectedCollega !== '__unassigned__';
+  const mineLabel = isPersonSelected ? (getCollega(selectedCollega)?.naam.split(' ')[0] + 's evenementen') : 'Selecteer collega';
+  const mineValue = isPersonSelected ? state.events.filter(e => (e.toegewezen || []).includes(selectedCollega)).length : '—';
+  const unass = state.events.filter(e => !e.toegewezen || e.toegewezen.length === 0).length;
+  $('stats').innerHTML = `
+    <div class="stat-card"><div class="label">Totaal evenementen</div><div class="value">${total}</div></div>
+    <div class="stat-card"><div class="label">Aankomend</div><div class="value">${upcoming}</div></div>
+    <div class="stat-card"><div class="label">${mineLabel}</div><div class="value">${mineValue}</div></div>
+    <div class="stat-card stat-clickable" id="stat-unassigned" title="Klik om alleen niet-toegewezen evenementen te tonen"><div class="label">Niet toegewezen</div><div class="value">${unass}</div></div>`;
+  const su = $('stat-unassigned');
+  if (su) su.onclick = () => {
+    state.filter.collega = state.filter.collega === '__unassigned__' ? '' : '__unassigned__';
+    render();
+  };
+}
+
+function renderLegend() {
+  if (state.colorMode === 'status') {
+    $('legend').innerHTML = KALENDER_STATUSSEN.map(s =>
+      `<span class="legend-item"><span class="legend-swatch" style="background:${STATUS_COLORS[s].border}"></span>${s}</span>`
+    ).join('');
+  } else {
+    $('legend').innerHTML = state.team.map(t => {
+      const c = teamColor(t.id);
+      return `<span class="legend-item"><span class="legend-swatch" style="background:${c.border}"></span>${esc(t.naam)}</span>`;
+    }).join('') + '<span class="legend-item"><span class="legend-swatch" style="background:#888780"></span>Niet toegewezen</span>';
+  }
+}
+
+function eventColor(ev) {
+  if (state.colorMode === 'collega') {
+    const firstId = (ev.toegewezen || [])[0];
+    if (firstId) return teamColor(firstId);
+    return { bg: '#F1EFE8', fg: '#2C2C2A', border: '#888780' };
+  }
+  return STATUS_COLORS[ev.status] || STATUS_COLORS['Nieuw'];
+}
+
+// hideNew=true: verberg 'Nieuw'-status events (gebruik in de kalender)
+function applyFilters(events, hideNew) {
+  return events.filter(ev => {
+    if (hideNew && ev.status === 'Nieuw') return false;
+    if (state.filter.collega === '__unassigned__') {
+      if (ev.toegewezen && ev.toegewezen.length > 0) return false;
+    } else if (state.filter.collega) {
+      if (!(ev.toegewezen || []).includes(state.filter.collega)) return false;
+    }
+    if (state.filter.status && ev.status !== state.filter.status) return false;
+    if (state.filter.type && ev.type !== state.filter.type) return false;
+    if (state.filter.tag && !(ev.themaTags || []).includes(state.filter.tag)) return false;
+    return true;
+  });
+}
+
+function renderCalendar() {
+  const d = state.calDate, year = d.getFullYear(), month = d.getMonth();
+  const monthNames = ['januari','februari','maart','april','mei','juni','juli','augustus','september','oktober','november','december'];
+  $('cal-title').textContent = monthNames[month] + ' ' + year;
+  // Render de dagheaders dynamisch — altijd Ma t/m Zo (Nederlandse weekstart)
+  $('cal-weekdays').innerHTML = ['Ma','Di','Wo','Do','Vr','Za','Zo'].map(d => `<div>${d}</div>`).join('');
+  const first = new Date(year, month, 1);
+  const startOffset = (first.getDay() + 6) % 7;
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const daysInPrev = new Date(year, month, 0).getDate();
+  const today = new Date(); today.setHours(0,0,0,0);
+
+  const visible = applyFilters(state.events, true);  // verberg Nieuw-status in kalender
+  const eventsByDate = {};
+  visible.forEach(ev => {
+    if (!ev.startDate) return;
+    const start = new Date(ev.startDate + 'T00:00:00');
+    const end = ev.endDate ? new Date(ev.endDate + 'T00:00:00') : start;
+    for (let dt = new Date(start); dt <= end; dt.setDate(dt.getDate() + 1)) {
+      const k = dt.toISOString().slice(0,10);
+      (eventsByDate[k] = eventsByDate[k] || []).push(ev);
+    }
+  });
+
+  let html = '';
+  for (let i = startOffset - 1; i >= 0; i--) {
+    html += `<div class="cal-cell other-month"><div class="daynum">${daysInPrev - i}</div></div>`;
+  }
+  for (let day = 1; day <= daysInMonth; day++) {
+    const dt = new Date(year, month, day);
+    const k = dt.toISOString().slice(0,10);
+    const isToday = dt.getTime() === today.getTime();
+    const evs = eventsByDate[k] || [];
+    const evHtml = evs.slice(0, 3).map(ev => {
+      const c = eventColor(ev);
+      const cancelled = ev.status === 'Geannuleerd' ? 'cancelled' : '';
+      return `<div class="cal-event ${cancelled}" style="background:${c.bg};color:${c.fg};border-left-color:${c.border}" data-event="${ev.id}" title="${esc(ev.naam)}">${esc(ev.naam)}</div>`;
+    }).join('');
+    const more = evs.length > 3 ? `<div class="cal-event" style="background:transparent;color:var(--text-muted);border:none">+${evs.length - 3} meer</div>` : '';
+    html += `<div class="cal-cell ${isToday ? 'today' : ''}" data-date="${k}"><div class="daynum">${day}</div>${evHtml}${more}</div>`;
+  }
+  const totalCells = startOffset + daysInMonth;
+  const trailing = (7 - (totalCells % 7)) % 7;
+  for (let day = 1; day <= trailing; day++) {
+    html += `<div class="cal-cell other-month"><div class="daynum">${day}</div></div>`;
+  }
+  const grid = $('cal-grid');
+  grid.innerHTML = html;
+  grid.querySelectorAll('.cal-event[data-event]').forEach(el => {
+    el.onclick = e => { e.stopPropagation(); openEventModal(el.dataset.event); };
+  });
+  grid.querySelectorAll('.cal-cell[data-date]').forEach(el => {
+    el.onclick = () => {
+      if (isAdmin()) openEventModal(null, el.dataset.date);
+    };
+  });
+}
+
+function renderList() {
+  let evs = applyFilters(state.events);
+  const q = state.listSearch.toLowerCase();
+  if (q) {
+    evs = evs.filter(e =>
+      (e.naam || '').toLowerCase().includes(q) ||
+      (e.locatie || '').toLowerCase().includes(q) ||
+      (e.organisator || '').toLowerCase().includes(q)
+    );
+  }
+  evs.sort((a, b) => {
+    if (state.listSort === 'date-desc') return (b.startDate || '').localeCompare(a.startDate || '');
+    if (state.listSort === 'naam') return (a.naam || '').localeCompare(b.naam || '');
+    return (a.startDate || '').localeCompare(b.startDate || '');
+  });
+  const tbody = $('event-list');
+  if (!evs.length) {
+    tbody.innerHTML = '<tr><td colspan="6" class="empty">Geen evenementen gevonden.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = evs.map(ev => {
+    const team = (ev.toegewezen || []).map(id => {
+      const c = getCollega(id);
+      if (!c) return '';
+      const col = teamColor(id);
+      return `<span class="person-chip"><span class="avatar" style="background:${col.border}">${esc(c.initialen)}</span>${esc(c.naam.split(' ')[0])}</span>`;
+    }).join('');
+    const ds = deadlineStatus(ev.deadline);
+    const typeLabels = (ev.type ? `<span class="type-label">${esc(ev.type)}</span>` : '') + (ev.vorm ? `<span class="vorm-label">${esc(ev.vorm)}</span>` : '');
+    return `<tr class="row-clickable" data-event="${ev.id}">
+      <td>${fmtDate(ev.startDate)}${ev.endDate && ev.endDate !== ev.startDate ? ' – ' + fmtDate(ev.endDate) : ''}${ev.startTime ? '<br><span style="color:var(--text-muted);font-size:11px">' + esc(ev.startTime) + '</span>' : ''}${ds ? '<br><span class="deadline-warn ' + (ds.type === 'passed' ? 'deadline-passed' : '') + '" style="margin-top:3px;font-size:10px">' + ds.text + '</span>' : ''}</td>
+      <td><strong>${esc(ev.naam || '(geen naam)')}</strong>${ev.organisator ? '<br><span style="color:var(--text-muted);font-size:11px">' + esc(ev.organisator) + '</span>' : ''}${typeLabels ? '<br><span style="margin-top:3px;display:inline-block">' + typeLabels + '</span>' : ''}</td>
+      <td>${esc(ev.locatie || '—')}</td>
+      <td>${(ev.themaTags || []).slice(0, 3).map(t => `<span class="tag-chip tag-active">${esc(t)}</span>`).join('') + ((ev.themaTags || []).length > 3 ? `<span style="color:var(--text-muted);font-size:11px"> +${(ev.themaTags||[]).length - 3}</span>` : '') || '<span style="color:var(--text-subtle);font-size:11px">—</span>'}</td>
+      <td>${team || '<span style="color:var(--text-subtle);font-size:11px">niet toegewezen</span>'}</td>
+      <td><span class="badge badge-${statusClass(ev.status)}">${ev.status}</span></td>
+    </tr>`;
+  }).join('');
+  tbody.querySelectorAll('tr').forEach(tr => {
+    tr.onclick = () => openEventModal(tr.dataset.event);
+  });
+}
+
+function renderTeam() {
+  const tbody = $('team-list');
+  tbody.innerHTML = state.team.map(t => {
+    const count = state.events.filter(e => (e.toegewezen || []).includes(t.id)).length;
+    const col = teamColor(t.id);
+    const delBtn = isAdmin()
+      ? `<button class="btn btn-danger" data-del="${t.id}">Verwijder</button>`
+      : '<span style="color:var(--text-subtle);font-size:11px">—</span>';
+    return `<tr>
+      <td><span class="avatar" style="background:${col.border};margin-right:8px">${esc(t.initialen)}</span>${esc(t.naam)}</td>
+      <td><span style="display:inline-block;width:14px;height:14px;border-radius:3px;background:${col.border};vertical-align:-2px;margin-right:6px"></span><span style="color:var(--text-muted);font-size:11px">${col.border}</span></td>
+      <td>${count}</td>
+      <td>${delBtn}</td>
+    </tr>`;
+  }).join('') || '<tr><td colspan="4" class="empty">Nog geen teamleden.</td></tr>';
+  tbody.querySelectorAll('[data-del]').forEach(btn => {
+    btn.onclick = () => {
+      if (!isAdmin()) return;
+      if (!confirm('Weet je zeker dat je deze collega wilt verwijderen?')) return;
+      state.team = state.team.filter(t => t.id !== btn.dataset.del);
+      state.events.forEach(e => { e.toegewezen = (e.toegewezen || []).filter(id => id !== btn.dataset.del); });
+      markChanged();
+      render();
+    };
+  });
+}
+
+function renderPublishStatus() {
+  const ps = $('publish-status');
+  if (!ps) return;
+  const lastPub = state.publishedTimestamp ? fmtDateTime(state.publishedTimestamp) : 'nog nooit';
+  if (state.isDirty) {
+    ps.innerHTML = `<div class="banner banner-warn"><span class="banner-icon">!</span><div>Er zijn niet-gepubliceerde wijzigingen. Laatst gepubliceerd: ${lastPub}.</div></div>`;
+  } else {
+    ps.innerHTML = `<div class="banner banner-success"><span class="banner-icon">✓</span><div>Alles is gepubliceerd. Laatst gepubliceerd: ${lastPub}.</div></div>`;
+  }
+}
+
+
+function getNewEvents() {
+  return state.events.filter(ev => ev.status === 'Nieuw');
+}
+
+function renderNieuwBadge() {
+  const n = getNewEvents().length;
+  const badge = $('nieuw-badge');
+  if (!badge) return;
+  badge.textContent = n;
+  badge.classList.toggle('hidden', n === 0);
+}
+
+function renderNieuwTab() {
+  const grid = $('nieuw-grid');
+  if (!grid) return;
+  const newEvs = getNewEvents().slice().sort((a, b) => (a.startDate || '').localeCompare(b.startDate || ''));
+
+  if (!newEvs.length) {
+    grid.innerHTML = `<div class="nieuw-empty"><div class="big-check">✓</div><p>Helemaal bij — er staan geen onbesproken evenementen open.<br>Zodra je een nieuw bestand uploadt of een evenement met status 'Nieuw' toevoegt, verschijnt het hier.</p></div>`;
+    return;
+  }
+
+  grid.innerHTML = newEvs.map(ev => {
+    const assigned = ev.toegewezen || [];
+    const peopleBtns = state.team.map(t => {
+      const checked = assigned.includes(t.id);
+      const col = teamColor(t.id);
+      return `<button class="nieuw-status-btn${checked ? ' s-ingepland' : ''}" data-toggle-person="${ev.id}|${t.id}" ${!isAdmin() ? 'disabled' : ''} style="padding:3px 9px 3px 3px;border-radius:99px;display:inline-flex;align-items:center;gap:5px">
+        <span class="avatar" style="background:${col.border};width:16px;height:16px;font-size:8px">${esc(t.initialen)}</span>${esc(t.naam.split(' ')[0])}
+      </button>`;
+    }).join('');
+
+    return `<div class="nieuw-card">
+      <div class="nieuw-card-top">
+        <div style="flex:1;min-width:0">
+          <div class="nieuw-card-title">${esc(ev.naam || '(geen naam)')}</div>
+          <div class="nieuw-card-meta">
+            <span class="new-flag">Nieuw</span>
+            <span>${fmtDate(ev.startDate)}${ev.endDate && ev.endDate !== ev.startDate ? ' – ' + fmtDate(ev.endDate) : ''}</span>
+            <span class="sep">·</span>
+            <span>${esc(ev.locatie || 'Locatie onbekend')}</span>
+            ${ev.organisator ? `<span class="sep">·</span><span>${esc(ev.organisator)}</span>` : ''}
+            ${ev.type ? `<span class="type-label">${esc(ev.type)}</span>` : ''}
+          </div>
+        </div>
+        <button class="btn" data-open="${ev.id}">Bekijk / bewerk</button>
+      </div>
+      ${ev.notities ? `<div class="nieuw-card-desc">${esc(ev.notities)}</div>` : ''}
+      ${isAdmin() ? `<div class="nieuw-card-actions">
+        <div style="flex:1;display:flex;gap:5px;flex-wrap:wrap">${peopleBtns}</div>
+        <button class="nieuw-status-btn s-ingepland" data-set-status="${ev.id}|Ingepland">→ Ingepland</button>
+        <button class="nieuw-status-btn s-niet" data-set-status="${ev.id}|Niet aanwezig">→ Niet aanwezig</button>
+      </div>` : ''}
+    </div>`;
+  }).join('');
+
+  grid.querySelectorAll('[data-open]').forEach(btn => {
+    btn.onclick = () => openEventModal(btn.dataset.open);
+  });
+  grid.querySelectorAll('[data-set-status]').forEach(btn => {
+    btn.onclick = () => {
+      if (!isAdmin()) return;
+      const [evId, newStatus] = btn.dataset.setStatus.split('|');
+      const ev = state.events.find(e => e.id === evId);
+      if (!ev) return;
+      ev.status = newStatus;
+      markChanged();
+      render();
+    };
+  });
+  grid.querySelectorAll('[data-toggle-person]').forEach(btn => {
+    btn.onclick = () => {
+      if (!isAdmin()) return;
+      const [evId, personId] = btn.dataset.togglePerson.split('|');
+      const ev = state.events.find(e => e.id === evId);
+      if (!ev) return;
+      ev.toegewezen = ev.toegewezen || [];
+      if (ev.toegewezen.includes(personId)) ev.toegewezen = ev.toegewezen.filter(id => id !== personId);
+      else ev.toegewezen.push(personId);
+      markChanged();
+      renderNieuwTab();
+    };
+  });
+}
+
+function render() {
+  autoUpdatePastEvents();  // markeer voorbije evenementen als 'Geweest' bij elke render
+  renderRoleUI();
+  renderFilters();
+  renderStats();
+  renderLegend();
+  renderPendingBadge();
+  renderNieuwBadge();
+  if (state.view === 'calendar') renderCalendar();
+  else if (state.view === 'nieuw') renderNieuwTab();
+  else if (state.view === 'list') renderList();
+  else if (state.view === 'team') renderTeam();
+  else if (state.view === 'publish') renderPublishStatus();
+  $('stats').style.display = (state.view === 'help' || state.view === 'publish') ? 'none' : '';
+}
+
+function openEventModal(eventId, prefilledDate) {
+  const isNew = !eventId;
+  if (isNew && !isAdmin()) return;
+  let ev = isNew
+    ? { id: nid(), naam: '', startDate: prefilledDate || new Date().toISOString().slice(0,10),
+        endDate: '', startTime: '', endTime: '', locatie: '', organisator: '',
+        status: 'Nieuw', toegewezen: [], website: '', notities: '',
+        type: '', vorm: '', deadline: '', kosten: '', werktijd: null, themaTags: [],
+        aangemaaktDoor: 'admin', aangemaaktOp: new Date().toISOString() }
+    : { ...state.events.find(e => e.id === eventId) };
+  let editing = isNew && isAdmin();
+
+  function rm() {
+    $('modal-title').textContent = isNew ? 'Nieuw evenement' : (editing ? 'Bewerken' : ev.naam || 'Evenement');
+    const body = $('modal-body');
+    if (editing) {
+      body.innerHTML = `
+        <div class="form-row"><label>Naam evenement *</label><input id="f-naam" value="${esc(ev.naam)}" placeholder="bv. Provada 2026"></div>
+        <div class="form-grid">
+          <div class="form-row"><label>Startdatum *</label><input type="date" id="f-startDate" value="${ev.startDate || ''}"></div>
+          <div class="form-row"><label>Einddatum</label><input type="date" id="f-endDate" value="${ev.endDate || ''}"></div>
+          <div class="form-row"><label>Starttijd</label><input type="time" id="f-startTime" value="${ev.startTime || ''}"></div>
+          <div class="form-row"><label>Eindtijd</label><input type="time" id="f-endTime" value="${ev.endTime || ''}"></div>
+        </div>
+        <div class="form-row"><label>Inschrijfdeadline</label><input type="date" id="f-deadline" value="${ev.deadline || ''}"></div>
+        <div class="form-row"><label>Locatie</label><input id="f-locatie" value="${esc(ev.locatie)}" placeholder="bv. RAI Amsterdam"></div>
+        <div class="form-row"><label>Organisator</label><input id="f-organisator" value="${esc(ev.organisator)}" placeholder="bv. NEPROM"></div>
+        <div class="form-grid">
+          <div class="form-row"><label>Type evenement</label><select id="f-type"><option value="">— kies —</option>${TYPES.map(t => `<option ${ev.type === t ? 'selected' : ''}>${t}</option>`).join('')}</select></div>
+          <div class="form-row"><label>Vorm</label><select id="f-vorm"><option value="">— kies —</option>${VORMEN.map(v => `<option ${ev.vorm === v ? 'selected' : ''}>${v}</option>`).join('')}</select></div>
+        </div>
+        <div class="form-row"><label>Status</label><select id="f-status">${STATUSSEN.map(s => `<option ${ev.status === s ? 'selected' : ''}>${s}</option>`).join('')}</select></div>
+        <div class="form-row"><label>Thema-tags</label>
+          <div class="checkbox-group" id="f-tags">
+            ${THEMA_TAGS.map(t => `<label class="${(ev.themaTags || []).includes(t) ? 'checked' : ''}"><input type="checkbox" value="${t}" ${(ev.themaTags || []).includes(t) ? 'checked' : ''}>${t}</label>`).join('')}
+          </div>
+        </div>
+        <div class="form-row"><label>Kosten deelname</label><input id="f-kosten" value="${esc(ev.kosten)}" placeholder="bv. €295 (gratis voor leden)"></div>
+        <div class="form-row"><label>Onder werktijd?</label>
+          <div class="checkbox-group" id="f-werktijd-group" style="display:inline-flex">
+            <label class="${ev.werktijd === true ? 'checked' : ''}"><input type="radio" name="f-werktijd" value="ja" ${ev.werktijd === true ? 'checked' : ''}>Ja</label>
+            <label class="${ev.werktijd === false ? 'checked' : ''}"><input type="radio" name="f-werktijd" value="nee" ${ev.werktijd === false ? 'checked' : ''}>Nee</label>
+            <label class="${ev.werktijd === undefined || ev.werktijd === null ? 'checked' : ''}"><input type="radio" name="f-werktijd" value="onbekend" ${ev.werktijd === undefined || ev.werktijd === null ? 'checked' : ''}>Onbekend</label>
+          </div>
+        </div>
+        <div class="form-row"><label>Toegewezen aan</label>
+          <div class="checkbox-group" id="f-toegewezen">
+            ${state.team.map(t => { const col = teamColor(t.id); return `<label class="${(ev.toegewezen || []).includes(t.id) ? 'checked' : ''}"><input type="checkbox" value="${t.id}" ${(ev.toegewezen || []).includes(t.id) ? 'checked' : ''}><span class="avatar" style="background:${col.border};width:14px;height:14px;font-size:8px">${esc(t.initialen)}</span>${esc(t.naam)}</label>`; }).join('')}
+          </div>
+        </div>
+        <div class="form-row"><label>Website / inschrijflink</label><input id="f-website" value="${esc(ev.website)}" placeholder="https://…"></div>
+        <div class="form-row"><label>Notities</label><textarea id="f-notities" placeholder="Onderwerpen, sprekers, afspraken…">${esc(ev.notities)}</textarea></div>
+      `;
+      body.querySelectorAll('#f-toegewezen input').forEach(cb => {
+        cb.onchange = () => cb.parentElement.classList.toggle('checked', cb.checked);
+      });
+      body.querySelectorAll('#f-tags input').forEach(cb => {
+        cb.onchange = () => cb.parentElement.classList.toggle('checked', cb.checked);
+      });
+      body.querySelectorAll('#f-werktijd-group input[type="radio"]').forEach(rb => {
+        rb.onchange = () => {
+          body.querySelectorAll('#f-werktijd-group label').forEach(l => l.classList.remove('checked'));
+          rb.parentElement.classList.add('checked');
+        };
+      });
+    } else {
+      const collegas = (ev.toegewezen || []).map(id => {
+        const c = getCollega(id);
+        if (!c) return '';
+        const col = teamColor(id);
+        return `<span class="person-chip"><span class="avatar" style="background:${col.border}">${esc(c.initialen)}</span>${esc(c.naam)}</span>`;
+      }).join(' ') || '<span style="color:var(--text-subtle)">— nog niemand toegewezen</span>';
+      const tags = (ev.themaTags || []).map(t => `<span class="tag-chip tag-active">${esc(t)}</span>`).join(' ');
+      const ds = deadlineStatus(ev.deadline);
+      body.innerHTML = `
+        <div style="margin-bottom:16px">
+          <span class="badge badge-${statusClass(ev.status)}">${ev.status}</span>
+          ${ev.type ? `<span class="type-label" style="margin-left:6px">${esc(ev.type)}</span>` : ''}
+          ${ev.vorm ? `<span class="vorm-label" style="margin-left:6px">${esc(ev.vorm)}</span>` : ''}
+        </div>
+        <div class="detail-row"><div class="label">Datum</div><div>${fmtDate(ev.startDate)}${ev.endDate && ev.endDate !== ev.startDate ? ' — ' + fmtDate(ev.endDate) : ''}</div></div>
+        ${ev.startTime ? `<div class="detail-row"><div class="label">Tijd</div><div>${esc(ev.startTime)}${ev.endTime ? ' – ' + esc(ev.endTime) : ''}</div></div>` : ''}
+        ${ev.deadline ? `<div class="detail-row"><div class="label">Inschrijfdeadline</div><div>${fmtDate(ev.deadline)}${ds ? ` <span class="deadline-warn ${ds.type === 'passed' ? 'deadline-passed' : ''}" style="margin-left:6px">${ds.text}</span>` : ''}</div></div>` : ''}
+        <div class="detail-row"><div class="label">Locatie</div><div>${esc(ev.locatie || '—')}</div></div>
+        <div class="detail-row"><div class="label">Organisator</div><div>${esc(ev.organisator || '—')}</div></div>
+        ${tags ? `<div class="detail-row"><div class="label">Thema-tags</div><div>${tags}</div></div>` : ''}
+        ${ev.kosten ? `<div class="detail-row"><div class="label">Kosten</div><div>${esc(ev.kosten)}</div></div>` : ''}
+        ${ev.werktijd === true ? `<div class="detail-row"><div class="label">Onder werktijd</div><div><span style="background:var(--success-bg);color:#04342C;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:500">Ja</span></div></div>` : ''}
+        ${ev.werktijd === false ? `<div class="detail-row"><div class="label">Onder werktijd</div><div><span style="background:#F1EFE8;color:#2C2C2A;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:500">Nee</span></div></div>` : ''}
+        <div class="detail-row"><div class="label">Wie gaat erheen</div><div>${collegas}</div></div>
+        ${ev.website ? `<div class="detail-row"><div class="label">Website</div><div><a href="${esc(ev.website)}" target="_blank" rel="noopener" style="color:var(--accent)">${esc(ev.website)}</a></div></div>` : ''}
+        ${ev.notities ? `<div class="detail-row"><div class="label">Notities</div><div style="white-space:pre-wrap">${esc(ev.notities)}</div></div>` : ''}
+        <div class="detail-row"><div class="label">Aangemaakt</div><div style="color:var(--text-muted);font-size:12px">${ev.aangemaaktOp ? new Date(ev.aangemaaktOp).toLocaleDateString('nl-NL') : '—'}</div></div>
+      `;
+    }
+    const footer = $('modal-footer');
+    if (editing) {
+      footer.innerHTML = `
+        <div>${isNew ? '' : '<button class="btn btn-danger" id="btn-delete">Verwijder evenement</button>'}</div>
+        <div style="display:flex;gap:8px">
+          <button class="btn" id="btn-cancel">Annuleer</button>
+          <button class="btn btn-primary" id="btn-save">Opslaan</button>
+        </div>`;
+      $('btn-cancel').onclick = () => { if (isNew) closeModal(); else { editing = false; rm(); } };
+      $('btn-save').onclick = () => {
+        const naam = $('f-naam').value.trim();
+        const startDate = $('f-startDate').value;
+        if (!naam) { alert('Geef het evenement een naam.'); return; }
+        if (!startDate) { alert('Geef een startdatum op.'); return; }
+        ev.naam = naam; ev.startDate = startDate;
+        ev.endDate = $('f-endDate').value;
+        ev.startTime = $('f-startTime').value;
+        ev.endTime = $('f-endTime').value;
+        ev.deadline = $('f-deadline').value;
+        ev.locatie = $('f-locatie').value.trim();
+        ev.organisator = $('f-organisator').value.trim();
+
+        ev.status = $('f-status').value;
+        ev.type = $('f-type').value;
+        ev.vorm = $('f-vorm').value;
+        ev.kosten = $('f-kosten').value.trim();
+        const wt = document.querySelector('#f-werktijd-group input[type="radio"]:checked');
+        if (wt) {
+          if (wt.value === 'ja') ev.werktijd = true;
+          else if (wt.value === 'nee') ev.werktijd = false;
+          else ev.werktijd = null;
+        }
+        ev.website = $('f-website').value.trim();
+        ev.notities = $('f-notities').value;
+        ev.toegewezen = Array.from(document.querySelectorAll('#f-toegewezen input:checked')).map(cb => cb.value);
+        ev.themaTags = Array.from(document.querySelectorAll('#f-tags input:checked')).map(cb => cb.value);
+        if (isNew) state.events.push(ev);
+        else { const idx = state.events.findIndex(e => e.id === ev.id); if (idx >= 0) state.events[idx] = ev; }
+        markChanged();
+        closeModal();
+        render();
+      };
+      const db = $('btn-delete'); if (db) db.onclick = () => {
+        if (!confirm('Weet je zeker dat je dit evenement wilt verwijderen?')) return;
+        state.events = state.events.filter(e => e.id !== ev.id);
+        markChanged();
+        closeModal();
+        render();
+      };
+    } else {
+      const editBtn = isAdmin() ? '<button class="btn btn-primary" id="btn-edit-view">Bewerken</button>' : '';
+      const delBtn = isAdmin() ? '<button class="btn btn-danger" id="btn-delete-view">Verwijder</button>' : '<div></div>';
+      footer.innerHTML = `${delBtn}<div style="display:flex;gap:8px"><button class="btn" id="btn-close-view">Sluit</button>${editBtn}</div>`;
+      const eb = $('btn-edit-view'); if (eb) eb.onclick = () => { editing = true; rm(); };
+      $('btn-close-view').onclick = closeModal;
+      const db = $('btn-delete-view'); if (db) db.onclick = () => {
+        if (!confirm('Weet je zeker dat je dit evenement wilt verwijderen?')) return;
+        state.events = state.events.filter(e => e.id !== ev.id);
+        markChanged();
+        closeModal();
+        render();
+      };
+    }
+  }
+  $('event-modal').classList.remove('hidden');
+  rm();
+}
+
+function closeModal() { $('event-modal').classList.add('hidden'); }
+$('modal-close').onclick = closeModal;
+$('event-modal').onclick = e => { if (e.target.id === 'event-modal') closeModal(); };
+
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.onclick = () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    state.view = tab.dataset.tab;
+    ['calendar','nieuw','list','team','publish','help'].forEach(v => {
+      const el = $('view-' + v);
+      if (el) el.classList.toggle('hidden', v !== state.view);
+    });
+    render();
+  };
+});
+
+$('cal-prev').onclick = () => { state.calDate = new Date(state.calDate.getFullYear(), state.calDate.getMonth() - 1, 1); renderCalendar(); };
+$('cal-next').onclick = () => { state.calDate = new Date(state.calDate.getFullYear(), state.calDate.getMonth() + 1, 1); renderCalendar(); };
+$('cal-today').onclick = () => { state.calDate = new Date(); renderCalendar(); };
+$('btn-new-event').onclick = () => { if (isAdmin()) openEventModal(); };
+
+$('list-search').oninput = e => { state.listSearch = e.target.value; renderList(); };
+$('list-sort').onchange = e => { state.listSort = e.target.value; renderList(); };
+
+$('btn-export-csv').onclick = () => {
+  const headers = ['Naam','Startdatum','Einddatum','Starttijd','Eindtijd','Inschrijfdeadline','Locatie','Organisator','Type','Vorm','Status','Thema-tags','Kosten','Onder werktijd','Toegewezen','Website','Notities'];
+  const rows = state.events.map(e => [
+    e.naam, e.startDate, e.endDate, e.startTime, e.endTime, e.deadline,
+    e.locatie, e.organisator, e.type, e.vorm, e.status,
+    (e.themaTags || []).join('; '),
+    e.kosten,
+    e.werktijd === true ? 'Ja' : e.werktijd === false ? 'Nee' : '',
+    (e.toegewezen || []).map(id => getCollega(id)?.naam || '').join('; '),
+    e.website, (e.notities || '').replace(/\n/g, ' ')
+  ]);
+  const csv = [headers, ...rows].map(r => r.map(v => `"${(v || '').toString().replace(/"/g, '""')}"`).join(',')).join('\n');
+  downloadFile('evenementen.csv', csv, 'text/csv');
+};
+
+$('btn-add-collega').onclick = () => {
+  if (!isAdmin()) return;
+  const naam = $('new-collega-name').value.trim();
+  const init = $('new-collega-init').value.trim().toUpperCase();
+  if (!naam || !init) { alert('Vul naam en initialen in.'); return; }
+  state.team.push({ id: 't' + Date.now(), naam, initialen: init.slice(0, 3) });
+  markChanged();
+  $('new-collega-name').value = '';
+  $('new-collega-init').value = '';
+  render();
+};
+
+$('btn-export-data').onclick = () => {
+  state.publishedTimestamp = new Date().toISOString();
+  saveLocal(false);
+  state.isDirty = false;
+  localStorage.removeItem(LOCAL_DIRTY_KEY);
+  const data = {
+    events: state.events,
+    team: state.team,
+    publishedTimestamp: state.publishedTimestamp
+  };
+  downloadFile('data.json', JSON.stringify(data, null, 2), 'application/json');
+  render();
+};
+
+$('btn-import-data').onclick = () => $('file-import').click();
+$('file-import').onchange = async e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  try {
+    const text = await file.text();
+    const d = JSON.parse(text);
+    if (!d.events || !d.team) throw new Error('Ongeldig databestand');
+    if (!confirm('Lokale data overschrijven met geïmporteerd bestand?')) return;
+    applyData(d);
+    state.isDirty = false;
+    localStorage.removeItem(LOCAL_DIRTY_KEY);
+    saveLocal(false);
+    render();
+    alert('Data succesvol geïmporteerd.');
+  } catch (err) {
+    alert('Kon bestand niet inlezen: ' + err.message);
+  }
+  e.target.value = '';
+};
+
+$('btn-clear-data').onclick = () => {
+  if (!isAdmin()) return;
+  if (!confirm('Weet je zeker dat je alle lokale wijzigingen wilt wissen? De gepubliceerde versie wordt opnieuw geladen.')) return;
+  localStorage.removeItem(LOCAL_STORAGE_KEY);
+  localStorage.removeItem(LOCAL_DIRTY_KEY);
+  location.reload();
+};
+
+function downloadFile(name, content, type) {
+  const blob = new Blob([content], { type });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = name; a.click();
+  URL.revokeObjectURL(url);
+}
+
+(async function init() {
+  await loadInitialData();
+  $('loading').classList.add('hidden');
+  $('content').classList.remove('hidden');
+  render();
+})();
+</script>
+</body>
+</html>
