@@ -1,0 +1,590 @@
+{
+  "events": [
+    {
+      "id": "e_ds2026_01",
+      "naam": "Ledenbijeenkomst 5TRACKS Breda",
+      "startDate": "2026-07-01",
+      "endDate": "2026-07-01",
+      "startTime": "",
+      "endTime": "",
+      "locatie": "5TRACKS Offices, Breda",
+      "organisator": "NEPROM",
+      "status": "Nieuw",
+      "toegewezen": [],
+      "website": "https://www.neprom.nl/",
+      "notities": "Alleen toegankelijk voor NEPROM-lidbedrijven. Referentiecase voor knooppuntontwikkeling en programmatische menging (stationsomgeving 5TRACKS/CrossMark, mixed use).",
+      "type": "Bijeenkomst",
+      "vorm": "Fysiek",
+      "deadline": "",
+      "kosten": "Niet vermeld (alleen leden)",
+      "werktijd": null,
+      "themaTags": [
+        "Stedelijke transformatie"
+      ],
+      "aangemaaktDoor": "t1778161896148",
+      "aangemaaktOp": "2026-07-01T11:02:05.807842Z"
+    },
+    {
+      "id": "e_ds2026_02",
+      "naam": "IPLO Schakeldag Leeuwarden",
+      "startDate": "2026-07-02",
+      "endDate": "2026-07-02",
+      "startTime": "",
+      "endTime": "",
+      "locatie": "WestCord Hotel, Leeuwarden",
+      "organisator": "Informatiepunt Leefomgeving (IPLO)",
+      "status": "Nieuw",
+      "toegewezen": [],
+      "website": "https://iplo.nl/",
+      "notities": "Brede vakdag voor actualiteiten in het fysieke domein, met veel sessies rond Omgevingswet, uitvoering en regionale vraagstukken.",
+      "type": "Congres",
+      "vorm": "Fysiek",
+      "deadline": "",
+      "kosten": "Niet vermeld",
+      "werktijd": null,
+      "themaTags": [
+        "Omgevingswet"
+      ],
+      "aangemaaktDoor": "t1778161896148",
+      "aangemaaktOp": "2026-07-01T11:02:05.807842Z"
+    },
+    {
+      "id": "e_ds2026_03",
+      "naam": "New Gen Summer Event 2026",
+      "startDate": "2026-07-02",
+      "endDate": "2026-07-02",
+      "startTime": "",
+      "endTime": "",
+      "locatie": "Zuidas, Amsterdam (verzamelpunt The Valley, Beethovenstraat 301)",
+      "organisator": "NEPROM New Generation",
+      "status": "Nieuw",
+      "toegewezen": [],
+      "website": "https://www.neprom.nl/",
+      "notities": "Focus op mixed use en Zuidasprojecten (The Valley, The Pulse of Amsterdam, Stepstone). Meer geschikt voor jongere professionals.",
+      "type": "Bijeenkomst",
+      "vorm": "Fysiek",
+      "deadline": "",
+      "kosten": "Niet vermeld",
+      "werktijd": null,
+      "themaTags": [
+        "Woningbouw",
+        "Stedelijke transformatie"
+      ],
+      "aangemaaktDoor": "t1778161896148",
+      "aangemaaktOp": "2026-07-01T11:02:05.807842Z"
+    },
+    {
+      "id": "e_ds2026_04",
+      "naam": "Rondetafelgesprek Volkshuisvesting en fiscaliteit",
+      "startDate": "2026-09-02",
+      "endDate": "2026-09-02",
+      "startTime": "",
+      "endTime": "",
+      "locatie": "Tweede Kamer, Den Haag",
+      "organisator": "Tweede Kamer — vaste commissie Volkshuisvesting en Ruimtelijke Ordening",
+      "status": "Nieuw",
+      "toegewezen": [],
+      "website": "https://www.tweedekamer.nl/",
+      "notities": "Openbaar rondetafelgesprek. Bestuurlijk luistermoment rond fiscaliteit en woningmarktbeleid — vroege signalering van rijksrichting.",
+      "type": "Bijeenkomst",
+      "vorm": "Fysiek",
+      "deadline": "",
+      "kosten": "Gratis",
+      "werktijd": null,
+      "themaTags": [
+        "Woningbouw"
+      ],
+      "aangemaaktDoor": "t1778161896148",
+      "aangemaaktOp": "2026-07-01T11:02:05.807842Z"
+    },
+    {
+      "id": "e_ds2026_05",
+      "naam": "Openbare Ruimte Congres 2026",
+      "startDate": "2026-09-03",
+      "endDate": "2026-09-03",
+      "startTime": "",
+      "endTime": "",
+      "locatie": "Zaanstad",
+      "organisator": "Vakblad Stedelijk Interieur, NVTL, Stichting Steenbreek",
+      "status": "Nieuw",
+      "toegewezen": [],
+      "website": "https://stedelijkinterieur.eu/",
+      "notities": "Collega-deal €350 voor 2 personen; €50 korting voor abonnees/NVTL-leden en Steenbreekgemeenten. Integrale afweging tussen woningbouw, mobiliteit, klimaatadaptatie, beheer en leefkwaliteit.",
+      "type": "Congres",
+      "vorm": "Fysiek",
+      "deadline": "",
+      "kosten": "€350 collega-deal (2 pers.); €50 korting voor leden",
+      "werktijd": null,
+      "themaTags": [
+        "Stedelijke transformatie",
+        "Civieltechniek"
+      ],
+      "aangemaaktDoor": "t1778161896148",
+      "aangemaaktOp": "2026-07-01T11:02:05.807842Z"
+    },
+    {
+      "id": "e_ds2026_06",
+      "naam": "Bijeenkomst rapport 'Grond voor verbetering'",
+      "startDate": "2026-09-03",
+      "endDate": "2026-09-03",
+      "startTime": "",
+      "endTime": "",
+      "locatie": "Provinciehuis Zeeland, Abdij 6, Middelburg",
+      "organisator": "Rli-advies — uitnodiging via VvG",
+      "status": "Nieuw",
+      "toegewezen": [],
+      "website": "https://vvg.nl/",
+      "notities": "Focus op grondbeleid als sturingsmiddel en koppeling met woningbouw, leefbaarheid en maatschappelijke doelen. Bestuurders, ambtenaren, belangenbehartigers en overige geïnteresseerden.",
+      "type": "Bijeenkomst",
+      "vorm": "Fysiek",
+      "deadline": "",
+      "kosten": "Niet vermeld",
+      "werktijd": null,
+      "themaTags": [
+        "Grondbeleid",
+        "Planeconomie"
+      ],
+      "aangemaaktDoor": "t1778161896148",
+      "aangemaaktOp": "2026-07-01T11:02:05.807842Z"
+    },
+    {
+      "id": "e_ds2026_07",
+      "naam": "Dutch Green Building Week 2026",
+      "startDate": "2026-09-07",
+      "endDate": "2026-09-11",
+      "startTime": "",
+      "endTime": "",
+      "locatie": "Landelijk (mix online en offline)",
+      "organisator": "Dutch Green Building Council (DGBC)",
+      "status": "Nieuw",
+      "toegewezen": [],
+      "website": "https://www.dgbc.nl/",
+      "notities": "Weekprogramma rond brede welvaart, schaarste, betaalbaarheid, materialen, energie en leefkwaliteit. Congresdag op 8 september is het meest concrete onderdeel.",
+      "type": "Congres",
+      "vorm": "Hybride",
+      "deadline": "",
+      "kosten": "Niet vermeld",
+      "werktijd": null,
+      "themaTags": [
+        "Stedelijke transformatie",
+        "Woningbouw"
+      ],
+      "aangemaaktDoor": "t1778161896148",
+      "aangemaaktOp": "2026-07-01T11:02:05.807842Z"
+    },
+    {
+      "id": "e_ds2026_08",
+      "naam": "Congres Dutch Green Building Week 2026 — Almere",
+      "startDate": "2026-09-08",
+      "endDate": "2026-09-08",
+      "startTime": "",
+      "endTime": "",
+      "locatie": "Kunstlinie, Almere",
+      "organisator": "Dutch Green Building Council (DGBC)",
+      "status": "Nieuw",
+      "toegewezen": [],
+      "website": "https://www.dgbc.nl/",
+      "notities": "Vindt plaats in ALMERE. Kosteloos voor DGBC-partners; €190 excl. btw voor niet-partners. Thema's: brede welvaart, schaarste, leefbaarheid en integrale keuzes in de gebouwde omgeving.",
+      "type": "Congres",
+      "vorm": "Fysiek",
+      "deadline": "",
+      "kosten": "Gratis voor DGBC-partners; €190 excl. btw voor niet-partners",
+      "werktijd": null,
+      "themaTags": [
+        "Stedelijke transformatie",
+        "Woningbouw"
+      ],
+      "aangemaaktDoor": "t1778161896148",
+      "aangemaaktOp": "2026-07-01T11:02:05.807842Z"
+    },
+    {
+      "id": "e_ds2026_09",
+      "naam": "Congres Volkshuisvesting: Samen van ambitie naar actie",
+      "startDate": "2026-09-10",
+      "endDate": "2026-09-10",
+      "startTime": "",
+      "endTime": "",
+      "locatie": "Provinciehuis, Archimedeslaan 6, Utrecht",
+      "organisator": "Provincie Utrecht",
+      "status": "Nieuw",
+      "toegewezen": [],
+      "website": "https://www.provincie-utrecht.nl/",
+      "notities": "Programma gaat expliciet in op parallel plannen, RVO-instrumenten, netcongestie, koppelkansen in gebiedsontwikkeling, optoppen en uitvoering van volkshuisvestingsprogramma's. Apart deel voor wethouders.",
+      "type": "Congres",
+      "vorm": "Fysiek",
+      "deadline": "",
+      "kosten": "Niet vermeld",
+      "werktijd": null,
+      "themaTags": [
+        "Woningbouw",
+        "Grondbeleid"
+      ],
+      "aangemaaktDoor": "t1778161896148",
+      "aangemaaktOp": "2026-07-01T11:02:05.807842Z"
+    },
+    {
+      "id": "e_ds2026_10",
+      "naam": "Hoogbouwcongres 2026",
+      "startDate": "2026-09-16",
+      "endDate": "2026-09-16",
+      "startTime": "",
+      "endTime": "",
+      "locatie": "Kinepolis Jaarbeurs, Jaarbeursboulevard 300, Utrecht",
+      "organisator": "Vastgoedjournaal",
+      "status": "Nieuw",
+      "toegewezen": [],
+      "website": "https://vastgoedjournaal.nl/",
+      "notities": "€95 excl. btw p.p. Thema: sociale kwaliteit in hoogbouw. Relevant voor verdichting, centrumontwikkeling, stationsomgevingen en leefkwaliteit in intensiever bebouwde gebieden.",
+      "type": "Congres",
+      "vorm": "Fysiek",
+      "deadline": "",
+      "kosten": "€95 excl. btw",
+      "werktijd": null,
+      "themaTags": [
+        "Woningbouw",
+        "Stedelijke transformatie"
+      ],
+      "aangemaaktDoor": "t1778161896148",
+      "aangemaaktOp": "2026-07-01T11:02:05.807842Z"
+    },
+    {
+      "id": "e_ds2026_11",
+      "naam": "Commissiedebat Volkshuisvesting en fiscaliteit",
+      "startDate": "2026-09-24",
+      "endDate": "2026-09-24",
+      "startTime": "",
+      "endTime": "",
+      "locatie": "Tweede Kamer, Wttewaall van Stoetwegenzaal, Den Haag",
+      "organisator": "Tweede Kamer — vaste commissie Volkshuisvesting en Ruimtelijke Ordening",
+      "status": "Nieuw",
+      "toegewezen": [],
+      "website": "https://www.tweedekamer.nl/",
+      "notities": "Openbaar commissiedebat. Signaalmoment voor fiscale maatregelen en rijksbeleid rondom volkshuisvesting. Minister VRO en staatssecretaris Financiën aanwezig.",
+      "type": "Bijeenkomst",
+      "vorm": "Fysiek",
+      "deadline": "",
+      "kosten": "Gratis",
+      "werktijd": null,
+      "themaTags": [
+        "Woningbouw"
+      ],
+      "aangemaaktDoor": "t1778161896148",
+      "aangemaaktOp": "2026-07-01T11:02:05.807842Z"
+    },
+    {
+      "id": "e_ds2026_12",
+      "naam": "COMVAST 2026",
+      "startDate": "2026-09-29",
+      "endDate": "2026-09-29",
+      "startTime": "",
+      "endTime": "",
+      "locatie": "Beatrixgebouw Jaarbeurs, Jaarbeursplein 6, Utrecht",
+      "organisator": "COMVAST",
+      "status": "Nieuw",
+      "toegewezen": [],
+      "website": "https://www.comvast.nl/",
+      "notities": "Besloten vakbeurs op uitnodiging. Ontwikkelaars, eindgebruikers, beleggers, gemeenten en adviseurs in commercieel vastgoed. Relevant voor bedrijventerreinen, kantoren, retail, logistiek en vestigingsklimaat.",
+      "type": "Beurs",
+      "vorm": "Fysiek",
+      "deadline": "",
+      "kosten": "Op uitnodiging",
+      "werktijd": null,
+      "themaTags": [
+        "Stedelijke transformatie"
+      ],
+      "aangemaaktDoor": "t1778161896148",
+      "aangemaaktOp": "2026-07-01T11:02:05.807842Z"
+    },
+    {
+      "id": "e_ds2026_13",
+      "naam": "Stationsgebieden 2026",
+      "startDate": "2026-09-29",
+      "endDate": "2026-09-29",
+      "startTime": "",
+      "endTime": "",
+      "locatie": "Gardens Central Station, Bezuidenhoutseweg 9, Den Haag",
+      "organisator": "SPRYG Real Estate Academy",
+      "status": "Nieuw",
+      "toegewezen": [],
+      "website": "https://spryg.com/nl/events/stationsgebieden",
+      "notities": "€699 excl. btw; €599 excl. btw voor overheden. Koppeling OV-knooppunten, woningbouw, governance, financiering en gebiedsregie. Gemeente Almere staat op de deelnemerslijst.",
+      "type": "Congres",
+      "vorm": "Fysiek",
+      "deadline": "",
+      "kosten": "€699 excl. btw (€599 voor overheden)",
+      "werktijd": null,
+      "themaTags": [
+        "Stedelijke transformatie",
+        "Infra",
+        "Woningbouw"
+      ],
+      "aangemaaktDoor": "t1778161896148",
+      "aangemaaktOp": "2026-07-01T11:02:05.807842Z"
+    },
+    {
+      "id": "e_ds2026_14",
+      "naam": "Woningsplitsing 2026",
+      "startDate": "2026-09-29",
+      "endDate": "2026-09-29",
+      "startTime": "",
+      "endTime": "",
+      "locatie": "Gardens Central Station, Bezuidenhoutseweg 9, Den Haag",
+      "organisator": "SPRYG Real Estate Academy",
+      "status": "Nieuw",
+      "toegewezen": [],
+      "website": "https://spryg.com/nl/events/woningsplitsing",
+      "notities": "€699 excl. btw; €599 excl. btw voor overheden. Woningsplitsing als instrument om zonder nieuw ruimtebeslag extra woningen te realiseren. Juridische, financiële en bouwkundige haalbaarheid.",
+      "type": "Congres",
+      "vorm": "Fysiek",
+      "deadline": "",
+      "kosten": "€699 excl. btw (€599 voor overheden)",
+      "werktijd": null,
+      "themaTags": [
+        "Woningbouw"
+      ],
+      "aangemaaktDoor": "t1778161896148",
+      "aangemaaktOp": "2026-07-01T11:02:05.807842Z"
+    },
+    {
+      "id": "e_ds2026_15",
+      "naam": "Grondbeleid & Praktijk 2026",
+      "startDate": "2026-09-30",
+      "endDate": "2026-09-30",
+      "startTime": "",
+      "endTime": "",
+      "locatie": "Gardens Central Station, Bezuidenhoutseweg 9, Den Haag",
+      "organisator": "SPRYG Real Estate Academy",
+      "status": "Nieuw",
+      "toegewezen": [],
+      "website": "https://spryg.com/nl/events/grondbeleid-en-praktijk",
+      "notities": "€899 excl. btw; €799 excl. btw voor overheden. Meest directe vakdag: kostenverhaal, anterieure overeenkomsten, voorkeursrecht, Omgevingswet, PPS en gemeentelijke praktijkcases. Geert Jan Put (directeur grondzaken Almere / voorzitter VvG) is inhoudelijke spreker.",
+      "type": "Congres",
+      "vorm": "Fysiek",
+      "deadline": "",
+      "kosten": "€899 excl. btw (€799 voor overheden)",
+      "werktijd": null,
+      "themaTags": [
+        "Grondbeleid",
+        "Planeconomie",
+        "Kostenverhaal",
+        "Omgevingswet"
+      ],
+      "aangemaaktDoor": "t1778161896148",
+      "aangemaaktOp": "2026-07-01T11:02:05.807842Z"
+    },
+    {
+      "id": "e1778164437340_um33z",
+      "naam": "VNG Jaarcongres 2026",
+      "startDate": "2026-09-29",
+      "endDate": "2026-09-30",
+      "startTime": "",
+      "endTime": "",
+      "locatie": "Gemeente Oost Gelre",
+      "organisator": "VNG",
+      "status": "Nieuw",
+      "toegewezen": [],
+      "website": "https://vng.nl/nieuws/vng-jaarcongres-komt-in-2026-naar-de-achterhoek",
+      "notities": "",
+      "type": "Congres",
+      "vorm": "Fysiek",
+      "deadline": "",
+      "kosten": "",
+      "werktijd": null,
+      "themaTags": [
+        "BBV",
+        "Grondbeleid"
+      ],
+      "aangemaaktDoor": "t1778161733442",
+      "aangemaaktOp": "2026-05-07T14:33:57.340Z"
+    },
+    {
+      "id": "e1778167000000_imp015",
+      "naam": "Congres Nota Ruimte 2026",
+      "startDate": "2026-09-23",
+      "endDate": "2026-09-23",
+      "startTime": "12:00",
+      "endTime": "18:00",
+      "locatie": "Gardens Central Station, Den Haag",
+      "organisator": "SPRYG Real Estate Academy",
+      "status": "Nieuw",
+      "toegewezen": [],
+      "website": "https://spryg.com/nl/events/nota-ruimte",
+      "notities": "€699 excl. btw; €599 excl. btw voor deelnemers werkzaam bij overheden, corporaties, zorgverleners, retailers en logistiekers. Draait om Nota Ruimte, verstedelijkingsbeleid, bekostiging van gebiedsontwikkeling. Ook wel aangekondigd als 'Verstedelijkingscongres 2026'.",
+      "type": "Congres",
+      "vorm": "Fysiek",
+      "deadline": "",
+      "kosten": "€699 excl. btw (€599 voor overheden)",
+      "werktijd": null,
+      "themaTags": [
+        "Stedelijke transformatie",
+        "Grondbeleid",
+        "Planeconomie"
+      ],
+      "aangemaaktDoor": "t1778161896148",
+      "aangemaaktOp": "2026-05-07T15:00:00.000Z"
+    },
+    {
+      "id": "e1778167000000_imp018",
+      "naam": "KAN Congres 2026",
+      "startDate": "2026-10-27",
+      "endDate": "2026-10-27",
+      "startTime": "",
+      "endTime": "",
+      "locatie": "Vakwerkhuis, Delft",
+      "organisator": "KNOB, Platform31, SKG en VvG",
+      "status": "Nieuw",
+      "toegewezen": [],
+      "website": "https://stichtingkan.nl/congres2026",
+      "notities": "",
+      "type": "Congres",
+      "vorm": "Fysiek",
+      "deadline": "",
+      "kosten": "",
+      "werktijd": null,
+      "themaTags": [
+        "Stedelijke transformatie"
+      ],
+      "aangemaaktDoor": "t1778161896148",
+      "aangemaaktOp": "2026-05-07T15:00:00.000Z"
+    },
+    {
+      "id": "e1778167000000_imp028",
+      "naam": "Landelijke mer-dag 2026",
+      "startDate": "2026-10-08",
+      "endDate": "2026-10-08",
+      "startTime": "",
+      "endTime": "",
+      "locatie": "Figi, Zeist",
+      "organisator": "IPLO",
+      "status": "Nieuw",
+      "toegewezen": [],
+      "website": "https://iplo.nl/actueel/evenementenagenda/landelijke-mer-dag-2026/",
+      "notities": "",
+      "type": "Congres",
+      "vorm": "Fysiek",
+      "deadline": "",
+      "kosten": "",
+      "werktijd": null,
+      "themaTags": [
+        "Omgevingswet"
+      ],
+      "aangemaaktDoor": "t1778161896148",
+      "aangemaaktOp": "2026-05-07T15:00:00.000Z"
+    },
+    {
+      "id": "e1778167000000_imp035",
+      "naam": "Nationaal congres bodemdaling 2026",
+      "startDate": "2026-11-19",
+      "endDate": "2026-11-19",
+      "startTime": "",
+      "endTime": "",
+      "locatie": "nog niet vermeld",
+      "organisator": "IPLO",
+      "status": "Nieuw",
+      "toegewezen": [],
+      "website": "https://iplo.nl/actueel/evenementenagenda/nationaal-congres-bodemdaling-2026/",
+      "notities": "",
+      "type": "Congres",
+      "vorm": "Fysiek",
+      "deadline": "",
+      "kosten": "",
+      "werktijd": null,
+      "themaTags": [
+        "Civieltechniek",
+        "Omgevingswet"
+      ],
+      "aangemaaktDoor": "t1778161896148",
+      "aangemaaktOp": "2026-05-07T15:00:00.000Z"
+    }
+  ],
+  "team": [
+    {
+      "id": "t1778161733442",
+      "naam": "Ursula Bekman",
+      "initialen": "U.B"
+    },
+    {
+      "id": "t1778161743411",
+      "naam": "Mark Bouman",
+      "initialen": "M.B"
+    },
+    {
+      "id": "t1778161759620",
+      "naam": "Lisanne van den Broek",
+      "initialen": "L.V"
+    },
+    {
+      "id": "t1778161779251",
+      "naam": "Aslan Bulduk",
+      "initialen": "A.B"
+    },
+    {
+      "id": "t1778161791227",
+      "naam": "Marlies Chang-Bakker",
+      "initialen": "M.C"
+    },
+    {
+      "id": "t1778161802356",
+      "naam": "Aart Hendriks",
+      "initialen": "A.H"
+    },
+    {
+      "id": "t1778161811003",
+      "naam": "Martijn Jansen",
+      "initialen": "M.J"
+    },
+    {
+      "id": "t1778161820341",
+      "naam": "Martin Klijn",
+      "initialen": "M.K"
+    },
+    {
+      "id": "t1778161829935",
+      "naam": "Menno de Lange",
+      "initialen": "M.L"
+    },
+    {
+      "id": "t1778161839915",
+      "naam": "Varun Mahabir",
+      "initialen": "V.M"
+    },
+    {
+      "id": "t1778161849858",
+      "naam": "Peter Raven",
+      "initialen": "P.R"
+    },
+    {
+      "id": "t1778161862725",
+      "naam": "Jacques Wester",
+      "initialen": "J.W"
+    },
+    {
+      "id": "t1778161881797",
+      "naam": "Mathijs Mombarg",
+      "initialen": "M.M"
+    },
+    {
+      "id": "t1778161890352",
+      "naam": "Guido Bos",
+      "initialen": "G.B"
+    },
+    {
+      "id": "t1778161896148",
+      "naam": "Twan Nijkamp",
+      "initialen": "T.N"
+    },
+    {
+      "id": "t1778161925905",
+      "naam": "Astrid van Hooren",
+      "initialen": "A.H"
+    }
+  ],
+  "publishedTimestamp": "2026-07-01T11:02:05.807842Z",
+  "reviewedEventIds": [
+    "e1778164437340_um33z",
+    "e1778167000000_imp015",
+    "e1778167000000_imp018",
+    "e1778167000000_imp028",
+    "e1778167000000_imp035"
+  ]
+}
