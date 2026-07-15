@@ -16,7 +16,7 @@
     /* Neutrals — warm zinc */
     --zinc-50:  #FAFAFA;
     --zinc-100: #F4F4F5;
-    --zinc-200: #E4E4E7;
+    --zinc-200: #E4E4E7;h
     --zinc-300: #D4D4D8;
     --zinc-400: #A1A1AA;
     --zinc-500: #71717A;
@@ -1368,7 +1368,7 @@
     flex-direction: column;
     gap: 10px;
   }
-  .nieuw-card {
+  .nieuw-card { cursor: pointer;
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--r-lg);
@@ -2389,18 +2389,18 @@ function renderNieuwTab() {
             ${ev.type ? `<span class="type-label">${esc(ev.type)}</span>` : ''}
           </div>
         </div>
-        <button class="btn" data-open="${ev.id}">Bekijk / bewerk</button>
+        
       </div>
       ${ev.notities ? `<div class="nieuw-card-desc">${esc(ev.notities)}</div>` : ''}
       <div class="nieuw-card-actions">
-        <div class="nieuw-quick-assign">${peopleBtns}</div>
+        
         ${isAdmin() ? `<button class="btn btn-success" data-reviewed="${ev.id}">✓ Besproken</button>` : ''}
       </div>
     </div>`;
   }).join('');
 
-  grid.querySelectorAll('[data-open]').forEach(btn => {
-    btn.onclick = () => openEventModal(btn.dataset.open);
+  grid.querySelectorAll('[data-card]').forEach(btn => {
+    btn.onclick = (e) => { if (e.target.closest('button')) return; openEventModal(btn.dataset.card); };
   });
   grid.querySelectorAll('[data-reviewed]').forEach(btn => {
     btn.onclick = () => { markEventReviewed(btn.dataset.reviewed); renderNieuwBadge(); renderNieuwTab(); };
