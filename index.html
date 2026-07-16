@@ -1420,6 +1420,13 @@
     margin-top: 10px;
     line-height: 1.6;
   }
+
+  .terugblik-card::before { background: var(--fg-subtle); }
+  .terugblik-form-row { margin-top: 10px; }
+  .terugblik-form-row label { display: block; font-size: 12.5px; font-weight: 550; color: var(--fg-muted); margin-bottom: 6px; }
+  .terugblik-form-row textarea { min-height: 70px; resize: vertical; }
+  .terugblik-done-flag { font-size: 11.5px; font-weight: 600; color: var(--green-700); background: var(--green-50); padding: 3px 9px; border-radius: var(--r-full); white-space: nowrap; }
+  .terugblik-saved-msg { font-size: 12.5px; color: var(--green-700); font-weight: 500; margin-left: 4px; }
   .nieuw-card-actions {
     display: flex;
     gap: 10px;
@@ -1589,6 +1596,11 @@
         <span>Nieuw</span>
         <span id="nieuw-badge" class="tab-badge hidden">0</span>
       </button>
+            <button class="tab" data-tab="terugblik">
+        <i data-lucide="history"></i>
+        <span>Terugblik</span>
+        <span id="terugblik-badge" class="tab-badge hidden">0</span>
+      </button>
       <button class="tab" data-tab="list">
         <i data-lucide="list"></i>
         <span>Lijstweergave</span>
@@ -1706,6 +1718,17 @@
             </div>
           </div>
           <div class="nieuw-grid" id="nieuw-grid"></div>
+        </div>
+
+        <!-- ─── TERUGBLIK ─── -->
+        <div id="view-terugblik" class="hidden">
+          <div class="nieuw-banner">
+            <div>
+              <h2><i data-lucide="history"></i> Bezochte evenementen — terugblik</h2>
+              <p>Evenementen met status "Geweest" komen hier automatisch terecht. Klik in het tekstveld en schrijf een korte terugblik, zodat je bij een volgende editie snel kunt teruglezen of het de moeite waard was.</p>
+            </div>
+          </div>
+          <div class="nieuw-grid" id="terugblik-grid"></div>
         </div>
 
         <!-- ─── LIST ─── -->
@@ -2356,6 +2379,63 @@ function renderNieuwBadge() {
   badge.classList.toggle('hidden', n === 0);
 }
 
+function getVisitedEvents() { return state.events.filter(ev => ev.status === 'Geweest'); }
+
+function renderTerugblikBadge() {
+  const n = getVisitedEvents().filter(ev => !ev.terugblik || !ev.terugblik.trim()).length;
+  const badge = $('terugblik-badge');
+  if (!badge) return;
+  badge.textContent = n;
+  badge.classList.toggle('hidden', n === 0);
+}
+
+function renderTerugblikTab() {
+  const grid = $('terugblik-grid');
+  if (!grid) return;
+  const visited = getVisitedEvents().slice().sort((a, b) => (b.startDate || '').localeCompare(a.startDate || ''));
+
+  if (!visited.length) {
+    grid.innerHTML = `<div class="nieuw-empty"><div class="big-check">📋</div><p>Er zijn nog geen evenementen met status "Geweest".<br>Zodra een evenement is afgelopen, verschijnt het hier automatisch.</p></div>`;
+    return;
+  }
+
+  grid.innerHTML = visited.map(ev => {
+    const hasTerugblik = ev.terugblik && ev.terugblik.trim();
+    return `<div class="nieuw-card terugblik-card" data-terugblik-card="${ev.id}">
+      <div class="nieuw-card-top">
+        <div>
+          <div class="nieuw-card-title">${esc(ev.naam || '(geen naam)')}</div>
+          <div class="nieuw-card-meta">
+            <span>${fmtDate(ev.startDate)}${ev.endDate && ev.endDate !== ev.startDate ? ' – ' + fmtDate(ev.endDate) : ''}</span>
+            <span class="sep">·</span>
+            <span>${esc(ev.locatie || 'Locatie onbekend')}</span>
+            ${ev.type ? `<span class="sep">·</span><span class="type-label">${esc(ev.type)}</span>` : ''}
+          </div>
+        </div>
+        ${hasTerugblik ? '<span class="terugblik-done-flag">Terugblik toegevoegd</span>' : ''}
+      </div>
+      <div class="form-row terugblik-form-row">
+        <label>Terugblik — hoe was het?</label>
+        <textarea data-terugblik-input="${ev.id}" placeholder="Bijv. goed bezocht, nuttige contacten gelegd, volgend jaar weer heen…" ${!isAdmin() ? 'disabled' : ''}>${esc(ev.terugblik)}</textarea>
+      </div>
+      ${isAdmin() ? `<div class="nieuw-card-actions"><button class="btn btn-primary btn-sm" data-terugblik-save="${ev.id}">Terugblik opslaan</button><span class="terugblik-saved-msg" data-terugblik-msg="${ev.id}"></span></div>` : ''}
+    </div>`;
+  }).join('');
+
+  grid.querySelectorAll('[data-terugblik-save]').forEach(btn => {
+    btn.onclick = () => {
+      const id = btn.dataset.terugblikSave;
+      const ev = state.events.find(e => e.id === id);
+      const ta = grid.querySelector('[data-terugblik-input="' + id + '"]');
+      if (!ev || !ta) return;
+      ev.terugblik = ta.value;
+      markChanged();
+      renderTerugblikBadge();
+      renderTerugblikTab();
+    };
+  });
+}
+
 function renderNieuwTab() {
   const grid = $('nieuw-grid');
   const newEvs = getNewEvents().slice().sort((a, b) => (a.startDate || '').localeCompare(b.startDate || ''));
@@ -2429,9 +2509,11 @@ function render() {
   renderPendingBadge();
   renderSpoorTabs();
   renderNieuwBadge();
+  renderTerugblikBadge();
   if (state.view === 'calendar') renderCalendar();
   else if (state.view === 'nieuw') renderNieuwTab();
   else if (state.view === 'list') renderList();
+  else if (state.view === 'terugblik') renderTerugblikTab();
   else if (state.view === 'team') renderTeam();
   else if (state.view === 'publish') renderPublishStatus();
   $('stats').style.display = (state.view === 'help' || state.view === 'publish' || state.view === 'nieuw') ? 'none' : '';
@@ -2441,6 +2523,7 @@ function render() {
     calendar: { title: 'Kalender', sub: 'Overzicht van vakevenementen voor planeconomen en planners.', crumb: 'Kalender' },
     nieuw:    { title: 'Nieuw',     sub: 'Evenementen die nog door het team besproken moeten worden.', crumb: 'Nieuw' },
     list:     { title: 'Lijstweergave', sub: 'Alle evenementen in een doorzoekbare tabel.', crumb: 'Lijstweergave' },
+    terugblik: { title: 'Terugblik', sub: 'Bezochte evenementen: klik erop en schrijf een korte terugblik.', crumb: 'Terugblik' },
     team:     { title: 'Team',      sub: 'Beheer collega\'s en hun toegewezen evenementen.', crumb: 'Team' },
     publish:  { title: 'Publiceren', sub: 'Exporteer en publiceer wijzigingen naar GitHub.', crumb: 'Publiceren' },
     help:     { title: 'Handleiding', sub: 'Uitleg over alle functies van deze tool.', crumb: 'Handleiding' }
@@ -2628,7 +2711,7 @@ document.querySelectorAll('.tab').forEach(tab => {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     tab.classList.add('active');
     state.view = tab.dataset.tab;
-    ['calendar','nieuw','list','team','publish','help'].forEach(v => {
+    ['calendar','nieuw','list','terugblik','team','publish','help'].forEach(v => {
       const el = $('view-' + v);
       if (el) el.classList.toggle('hidden', v !== state.view);
     });
@@ -2725,7 +2808,7 @@ $('file-import-nieuw').onchange = async e => {
     render();
     state.view = 'nieuw';
     document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === 'nieuw'));
-    ['calendar','nieuw','list','team','publish','help'].forEach(v => {
+    ['calendar','nieuw','list','terugblik','team','publish','help'].forEach(v => {
       const el = $('view-' + v);
       if (el) el.classList.toggle('hidden', v !== 'nieuw');
     });
